@@ -98,9 +98,18 @@ public class FlowStatisticService {
     private Map<String, String> getHostMap() {
         Map<String, String> map = new LinkedHashMap<>();
 
+        map.putAll(getHostMap(1));
+        map.putAll(getHostMap(2));
+
+        return map;
+    }
+
+    private Map<String, String> getHostMap(int page) {
+        Map<String, String> map = new LinkedHashMap<>();
+
         try {
 
-            String myurl = "http://192.168.1.253/userRpm/AccessCtrlHostsListsRpm.htm";
+            String myurl = "http://192.168.1.253/userRpm/AccessCtrlHostsListsRpm.htm?Page="+page;
             Map<String, String> headers = new LinkedHashMap<>();
             headers.put("Connection", "keep-alive");
             headers.put("Upgrade-Insecure-Requests", "1");
@@ -167,9 +176,19 @@ public class FlowStatisticService {
     private Map<String, Integer> getAccessCtrlMap() {
         Map<String, Integer> map = new LinkedHashMap<>();
 
+        map.putAll(getAccessCtrlMap(1));
+        map.putAll(getAccessCtrlMap(2));
+
+        return map;
+    }
+
+
+    private Map<String, Integer> getAccessCtrlMap(int page ) {
+        Map<String, Integer> map = new LinkedHashMap<>();
+
         try {
 
-            String myurl = "http://192.168.1.253/userRpm/AccessCtrlAccessRulesRpm.htm?Page=1";
+            String myurl = "http://192.168.1.253/userRpm/AccessCtrlAccessRulesRpm.htm?Page="+page;
             Map<String, String> headers = new LinkedHashMap<>();
             headers.put("Connection", "keep-alive");
             headers.put("Upgrade-Insecure-Requests", "1");
@@ -228,6 +247,9 @@ public class FlowStatisticService {
 
         return map;
     }
+
+
+
 
     public boolean accessCtrl(FlowStatisticDto dto) {
         Map<String, Integer> ctrlmap = new HashMap<>();

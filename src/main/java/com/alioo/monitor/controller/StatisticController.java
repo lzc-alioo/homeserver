@@ -21,9 +21,9 @@ public class StatisticController {
         System.out.println("StatisticController...");
     }
 
-    @RequestMapping("/index")
+    @RequestMapping("/getList")
     public List<FlowStatisticDto> getList() {
-        System.out.println("main/index...");
+        System.out.println("statistic/getList...");
 
 
         List<FlowStatisticDto> list = flowStatisticService.getList();
