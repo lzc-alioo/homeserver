@@ -1,5 +1,6 @@
 mvn clean package
 
+rm -rf build
 mkdir build
 
 path_target=/Users/alioo/work/gitstudy/homeserver/target/

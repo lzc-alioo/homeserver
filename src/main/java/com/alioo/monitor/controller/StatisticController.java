@@ -1,13 +1,13 @@
 package com.alioo.monitor.controller;
 
-import com.alioo.monitor.router.tplink.FlowStatisticService;
-import com.alioo.monitor.router.tplink.dto.FlowStatisticDto;
+import com.alioo.monitor.router.AccessCtrlRequest;
+import com.alioo.monitor.router.FlowStatisticService;
+import com.alioo.monitor.router.dto.LbStatisticDto;
+import com.alioo.monitor.util.JsonUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
 
 @Slf4j
 @RestController
@@ -22,29 +22,26 @@ public class StatisticController {
     }
 
     @RequestMapping("/getList")
-    public List<FlowStatisticDto> getList() {
+    public LbStatisticDto getList() {
         System.out.println("statistic/getList...");
 
 
-        List<FlowStatisticDto> list = flowStatisticService.getList();
+        LbStatisticDto list = flowStatisticService.getList();
         return list;
     }
 
     /**
-     *
-     * @param dto  alias , switchCtrl 必填参数
      * @return
      */
     @RequestMapping("/accessCtrl")
-    public List<FlowStatisticDto>  accessCtrl(FlowStatisticDto dto) {
-        System.out.println("main/accessCtrl...");
+    public LbStatisticDto accessCtrl(AccessCtrlRequest request) {
+        System.out.println("main/accessCtrl...request:" + JsonUtil.toJson(request));
 
-
-        boolean flag= flowStatisticService.accessCtrl(dto);
-        log.info("设置网络结果dto:{},flag:{}",dto,flag);
+        String token = flowStatisticService.getToken();
+        boolean flag = flowStatisticService.accessCtrl(token, request);
+        log.info("设置网络结果request:{},flag:{}", JsonUtil.toJson(request), flag);
         return getList();
     }
-
 
 
 }

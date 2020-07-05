@@ -1,4 +1,4 @@
-package com.alioo.monitor.router.tplink.dto;
+package com.alioo.monitor.router.dto;
 
 import lombok.Data;
 
