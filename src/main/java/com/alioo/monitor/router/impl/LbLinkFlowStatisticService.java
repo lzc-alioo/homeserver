@@ -207,19 +207,19 @@ public class LbLinkFlowStatisticService implements FlowStatisticService {
 
         List<UnavailableTimeDto> list = getUnavailableTimeList();
 
-        AccessCtrlRequest request = new AccessCtrlRequest();
-        request.setMac("B8:FC:9A:3E:6A:DC");
-        list.stream().map(obj -> {
-            if (obj.getStartTimeStr().equals(now)) {
-                request.setAct("on");
-            } else if (obj.getEndTimeStr().equals(now)) {
-                request.setAct("off");
-            }
-            String token = getToken();
-            boolean flag = accessCtrl(token, request);
-            log.info("定时设置网络结果 now:{},request:{},flag:{}", now, JsonUtil.toJson(request), flag);
-            return request;
-        });
+//        AccessCtrlRequest request = new AccessCtrlRequest();
+//        request.setMac("B8:FC:9A:3E:6A:DC");
+//        list.stream().map(obj -> {
+//            if (obj.getStartTimeStr().equals(now)) {
+//                request.setAct("on");
+//            } else if (obj.getEndTimeStr().equals(now)) {
+//                request.setAct("off");
+//            }
+//            String token = getToken();
+//            boolean flag = accessCtrl(token, request);
+//            log.info("定时设置网络结果 now:{},request:{},flag:{}", now, JsonUtil.toJson(request), flag);
+//            return request;
+//        });
 
     }
 
