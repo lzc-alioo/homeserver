@@ -103,4 +103,14 @@ sudo /etc/init.d/nginx reload
 tail -f /var/log/nginx/*
 
 
+路由器管理后台
+http://192.168.16.198:8080/
+
+
+免密登录路由器管理后台
+http://192.168.16.198:8080/routeindex.html
+
+java+react开发的轻量级路由管理
+http://192.168.16.198:8081/
+
 

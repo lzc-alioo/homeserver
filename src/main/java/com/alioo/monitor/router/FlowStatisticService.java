@@ -2,6 +2,7 @@ package com.alioo.monitor.router;
 
 import com.alioo.monitor.router.dto.FlowStatisticDto;
 import com.alioo.monitor.router.dto.LbStatisticDto;
+import com.alioo.monitor.router.dto.UnavailableTimeDto;
 
 import java.util.List;
 
@@ -11,8 +12,12 @@ public interface FlowStatisticService {
 
     public LbStatisticDto getList();
 
-
     public boolean accessCtrl(String token, AccessCtrlRequest request);
 
 
+    public List<UnavailableTimeDto> getUnavailableTimeList();
+
+    public int updateUnavailableTimeList(List<UnavailableTimeDto> list);
+
+    public void checkNetWork();
 }

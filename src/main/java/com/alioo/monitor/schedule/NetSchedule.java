@@ -1,0 +1,29 @@
+package com.alioo.monitor.schedule;
+
+
+import com.alioo.monitor.router.FlowStatisticService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import javax.annotation.PostConstruct;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+
+@Component
+public class NetSchedule {
+
+    @Autowired
+    private FlowStatisticService flowStatisticService;
+
+    private ScheduledThreadPoolExecutor scheduledThreadPoolExecutor = new ScheduledThreadPoolExecutor(5, new ThreadPoolExecutor.AbortPolicy());
+
+    @PostConstruct
+    private void init() {
+
+        scheduledThreadPoolExecutor.scheduleAtFixedRate(() -> { flowStatisticService.checkNetWork(); }, 30L, 60L, TimeUnit.SECONDS);
+    }
+
+
+
+}

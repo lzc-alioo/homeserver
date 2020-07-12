@@ -5,17 +5,29 @@ import com.alioo.monitor.router.FlowStatisticService;
 import com.alioo.monitor.router.dto.LbStatisticDto;
 import com.alioo.monitor.router.dto.LoginDto;
 import com.alioo.monitor.router.dto.Result;
+import com.alioo.monitor.router.dto.UnavailableTimeDto;
+import com.alioo.monitor.util.DateTimeUtil;
+import com.alioo.monitor.util.FileUtil;
 import com.alioo.monitor.util.HttpUtil;
 import com.alioo.monitor.util.JsonUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
 public class LbLinkFlowStatisticService implements FlowStatisticService {
+
+
+    @Value("${app.path}")
+    private String path;
+
 
     public LbStatisticDto getList() {
 
@@ -137,6 +149,77 @@ public class LbLinkFlowStatisticService implements FlowStatisticService {
 
 
         return true;
+
+    }
+
+    public List<UnavailableTimeDto> getUnavailableTimeList() {
+
+        List<String> tmplist = FileUtil.readFile2List(path);
+        System.out.println("tmplist=" + tmplist);
+
+        List<UnavailableTimeDto> list = tmplist.stream()
+                .map(str -> {
+                    String[] arr = str.split(",");
+                    if (arr.length != 2) {
+                        return null;
+                    }
+                    String startTimeStr = arr[0];
+                    String endTimeStr = arr[1];
+
+                    return new UnavailableTimeDto(startTimeStr, endTimeStr);
+
+                })
+                .filter(dto -> dto != null)
+                .collect(Collectors.toList());
+
+
+//        list.add(new UnavailableTimeDto("08:00", "08:15"));
+//        list.add(new UnavailableTimeDto("09:00", "09:15"));
+
+
+        return list;
+
+    }
+
+
+    public int updateUnavailableTimeList(List<UnavailableTimeDto> list) {
+
+        List<String> tmplist = list.stream()
+                .map(dto -> {
+                    return dto.getStartTimeStr() + "," + dto.getEndTimeStr();
+                })
+                .filter(dto -> dto != null)
+                .collect(Collectors.toList());
+
+
+        FileUtil.writeFile2(path, tmplist);
+
+        return tmplist.size();
+
+    }
+
+
+    public void checkNetWork() {
+
+        String now = DateTimeUtil.getDateTimeString("HH:mm");
+        List<String> tmplist = FileUtil.readFile2List(path);
+        log.info("now:{},tmplist=" + tmplist);
+
+        List<UnavailableTimeDto> list = getUnavailableTimeList();
+
+        AccessCtrlRequest request = new AccessCtrlRequest();
+        request.setMac("B8:FC:9A:3E:6A:DC");
+        list.stream().map(obj -> {
+            if (obj.getStartTimeStr().equals(now)) {
+                request.setAct("on");
+            } else if (obj.getEndTimeStr().equals(now)) {
+                request.setAct("off");
+            }
+            String token = getToken();
+            boolean flag = accessCtrl(token, request);
+            log.info("定时设置网络结果 now:{},request:{},flag:{}", now, JsonUtil.toJson(request), flag);
+            return request;
+        });
 
     }
 
