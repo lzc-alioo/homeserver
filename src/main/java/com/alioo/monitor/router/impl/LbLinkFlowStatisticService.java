@@ -2,6 +2,7 @@ package com.alioo.monitor.router.impl;
 
 import com.alioo.monitor.router.AccessCtrlRequest;
 import com.alioo.monitor.router.FlowStatisticService;
+import com.alioo.monitor.router.TimeComponent;
 import com.alioo.monitor.router.dto.LbStatisticDto;
 import com.alioo.monitor.router.dto.LoginDto;
 import com.alioo.monitor.router.dto.Result;
@@ -11,13 +12,13 @@ import com.alioo.monitor.util.FileUtil;
 import com.alioo.monitor.util.HttpUtil;
 import com.alioo.monitor.util.JsonUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -29,15 +30,17 @@ public class LbLinkFlowStatisticService implements FlowStatisticService {
     private String path;
 
 
+    @Autowired
+    private TimeComponent timeComponent;
+
+    @Value("${mac.letv}")
+    private String macLetv;
+
+
     public LbStatisticDto getList() {
 
         String token = getToken();
         LbStatisticDto lbStatisticDto = getStatisticMap(token);
-
-//        AccessCtrlRequest accessCtrlRequest = new AccessCtrlRequest();
-//        accessCtrlRequest.setMac("80:0C:67:1F:69:F7");
-//        accessCtrlRequest.setAct("on");
-//        accessCtrl(token,accessCtrlRequest);
 
         return lbStatisticDto;
     }
@@ -115,9 +118,11 @@ public class LbLinkFlowStatisticService implements FlowStatisticService {
     }
 
 
-    public boolean accessCtrl(String token, AccessCtrlRequest request) {
+    public boolean accessCtrl(AccessCtrlRequest request) {
 
         try {
+            String token = getToken();
+
 
             String myurl = "http://192.168.16.1/protocol.csp?token=" + token + "&fname=net&opt=host_black&function=set&mac=" + request.getMac() + "&act=" + request.getAct();
             Map<String, String> headers = new LinkedHashMap<>();
@@ -154,28 +159,7 @@ public class LbLinkFlowStatisticService implements FlowStatisticService {
 
     public List<UnavailableTimeDto> getUnavailableTimeList() {
 
-        List<String> tmplist = FileUtil.readFile2List(path);
-        System.out.println("tmplist=" + tmplist);
-
-        List<UnavailableTimeDto> list = tmplist.stream()
-                .map(str -> {
-                    String[] arr = str.split(",");
-                    if (arr.length != 2) {
-                        return null;
-                    }
-                    String startTimeStr = arr[0];
-                    String endTimeStr = arr[1];
-
-                    return new UnavailableTimeDto(startTimeStr, endTimeStr);
-
-                })
-                .filter(dto -> dto != null)
-                .collect(Collectors.toList());
-
-
-//        list.add(new UnavailableTimeDto("08:00", "08:15"));
-//        list.add(new UnavailableTimeDto("09:00", "09:15"));
-
+        List<UnavailableTimeDto> list = timeComponent.getUnavailableTimeList();
 
         return list;
 
@@ -184,42 +168,44 @@ public class LbLinkFlowStatisticService implements FlowStatisticService {
 
     public int updateUnavailableTimeList(List<UnavailableTimeDto> list) {
 
-        List<String> tmplist = list.stream()
-                .map(dto -> {
-                    return dto.getStartTimeStr() + "," + dto.getEndTimeStr();
-                })
-                .filter(dto -> dto != null)
-                .collect(Collectors.toList());
+        int result = timeComponent.updateUnavailableTimeList(list);
 
-
-        FileUtil.writeFile2(path, tmplist);
-
-        return tmplist.size();
+        return result;
 
     }
 
 
     public void checkNetWork() {
 
-        String now = DateTimeUtil.getDateTimeString("HH:mm");
-        List<String> tmplist = FileUtil.readFile2List(path);
-        log.info("now:{},tmplist=" + tmplist);
+        try {
+            String now = DateTimeUtil.getDateTimeString("HH:mm");
+            List<String> tmplist = FileUtil.readFile2List(path);
+            log.info("checkNetWork scheduled now:{},tmplist=" + tmplist);
 
-        List<UnavailableTimeDto> list = getUnavailableTimeList();
+            List<UnavailableTimeDto> list = getUnavailableTimeList();
+            list.forEach(obj -> {
+                if (now.equals(obj.getStartTimeStr())) {
+                    log.info("checkNetWork scheduled 命中开始时间:{}" , obj.getStartTimeStr());
+                    AccessCtrlRequest request = new AccessCtrlRequest();
+                    request.setMac(macLetv);
+                    request.setAct("on");
+                    accessCtrl(request);
+                    return;
+                }
 
-//        AccessCtrlRequest request = new AccessCtrlRequest();
-//        request.setMac("B8:FC:9A:3E:6A:DC");
-//        list.stream().map(obj -> {
-//            if (obj.getStartTimeStr().equals(now)) {
-//                request.setAct("on");
-//            } else if (obj.getEndTimeStr().equals(now)) {
-//                request.setAct("off");
-//            }
-//            String token = getToken();
-//            boolean flag = accessCtrl(token, request);
-//            log.info("定时设置网络结果 now:{},request:{},flag:{}", now, JsonUtil.toJson(request), flag);
-//            return request;
-//        });
+                if (now.equals(obj.getEndTimeStr())) {
+                    log.info("checkNetWork scheduled 命中结束时间:{}" , obj.getEndTimeStr());
+                    AccessCtrlRequest request = new AccessCtrlRequest();
+                    request.setMac(macLetv);
+                    request.setAct("on");
+                    accessCtrl(request);
+                    return;
+                }
+            });
+        } catch (Exception e) {
+            log.error("出现异常了", e);
+        }
+
 
     }
 

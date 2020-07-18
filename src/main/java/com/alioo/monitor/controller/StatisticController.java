@@ -44,8 +44,7 @@ public class StatisticController {
         if(request.getMac()==null){
             return null;
         }
-        String token = flowStatisticService.getToken();
-        boolean flag = flowStatisticService.accessCtrl(token, request);
+        boolean flag = flowStatisticService.accessCtrl( request);
         log.info("设置网络结果request:{},flag:{}", JsonUtil.toJson(request), flag);
         return getList();
     }

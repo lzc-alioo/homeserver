@@ -20,10 +20,10 @@ public class NetSchedule {
 
     @PostConstruct
     private void init() {
-
-        scheduledThreadPoolExecutor.scheduleAtFixedRate(() -> { flowStatisticService.checkNetWork(); }, 30L, 60L, TimeUnit.SECONDS);
+        scheduledThreadPoolExecutor.scheduleAtFixedRate(() -> {
+            flowStatisticService.checkNetWork();
+        }, 10L, 60L, TimeUnit.SECONDS);
     }
-
 
 
 }

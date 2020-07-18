@@ -9,7 +9,7 @@ import lombok.RequiredArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor                //有参构造
-public class UnavailableTimeDto {
+public class UnavailableTimeDto implements Comparable<UnavailableTimeDto>{
 
     private String startTimeStr;
     private String endTimeStr;
@@ -25,6 +25,18 @@ public class UnavailableTimeDto {
 
         startTime=DateTimeUtil.toDateFromStr(DateTimeUtil.getDateString()+" "+startTimeStr+":00").getTime();
         endTime=DateTimeUtil.toDateFromStr(DateTimeUtil.getDateString()+" "+endTimeStr+":00").getTime();
+
+    }
+
+    @Override
+    public int compareTo(UnavailableTimeDto o) {
+         int tmp=this.getStartTimeStr().compareTo(o.getStartTimeStr());
+         if(tmp!=0){
+             return tmp;
+         }else{
+            return this.getEndTimeStr().compareTo(o.getEndTimeStr());
+         }
+
 
     }
 }

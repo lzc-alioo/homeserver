@@ -8,3 +8,6 @@ netty:
 
 server:
   port: 8081
+
+mac:
+  letv: B8:FC:9A:3E:6A:DC

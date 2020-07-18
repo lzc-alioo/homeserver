@@ -12,7 +12,7 @@ public interface FlowStatisticService {
 
     public LbStatisticDto getList();
 
-    public boolean accessCtrl(String token, AccessCtrlRequest request);
+    public boolean accessCtrl(AccessCtrlRequest request);
 
 
     public List<UnavailableTimeDto> getUnavailableTimeList();
