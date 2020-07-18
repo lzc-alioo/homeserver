@@ -197,7 +197,7 @@ public class LbLinkFlowStatisticService implements FlowStatisticService {
                     log.info("checkNetWork scheduled 命中结束时间:{}" , obj.getEndTimeStr());
                     AccessCtrlRequest request = new AccessCtrlRequest();
                     request.setMac(macLetv);
-                    request.setAct("on");
+                    request.setAct("off");
                     accessCtrl(request);
                     return;
                 }

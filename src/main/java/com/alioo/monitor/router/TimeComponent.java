@@ -23,9 +23,9 @@ public class TimeComponent {
 
     public List<UnavailableTimeDto> getUnavailableTimeList() {
 
-//        if (list != null && !list.isEmpty()) {
-//            return list;
-//        }
+        if (list != null && !list.isEmpty()) {
+            return list;
+        }
 
         List<String> tmplist = FileUtil.readFile2List(path);
         log.info("readfile path:" + path, "tmplist=" + tmplist);

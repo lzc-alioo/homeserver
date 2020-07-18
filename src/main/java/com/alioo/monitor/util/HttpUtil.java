@@ -97,12 +97,11 @@ public class HttpUtil {
                 ret = EntityUtils.toString(responseEntity);
                 //log.info("响应长度:" + responseEntity.getContentLength());
                 String tmp=ret;
-                long length=0;
+                long length=ret.length();
                 if(ret!=null && ret.length()>100){
                     tmp = ret.substring(0, 100);
-                    length = ret.length();
                 }
-                log.info("响应内容length:{},tmp:{}" ,length,tmp);
+                log.info("响应内容快照length:{},tmp:{}" ,length,tmp);
                 return ret;
             }
         } catch (ClientProtocolException e) {
