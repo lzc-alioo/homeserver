@@ -179,10 +179,10 @@ public class LbLinkFlowStatisticService implements FlowStatisticService {
 
         try {
             String now = DateTimeUtil.getDateTimeString("HH:mm");
-            List<String> tmplist = FileUtil.readFile2List(path);
-            log.info("checkNetWork scheduled now:{},tmplist=" + tmplist);
 
             List<UnavailableTimeDto> list = getUnavailableTimeList();
+            log.info("checkNetWork scheduled now:{},tmplist{}" ,now, JsonUtil.toJson(list));
+
             list.forEach(obj -> {
                 if (now.equals(obj.getStartTimeStr())) {
                     log.info("checkNetWork scheduled 命中开始时间:{}" , obj.getStartTimeStr());
