@@ -8,6 +8,23 @@ netty:
 
 server:
   port: 8081
+  #内嵌tomcat日志
+  tomcat:
+    accesslog:
+      enabled: true
+      directory: /Users/alioo/work/temp/tomcatLog/
+      pattern: '%t %a %A %m %U%q %s %D %I %B'  #日志格式
+      #      buffered: false
+#      file-date-format: yyyy-MM-dd
+      prefix: access
+#      rename-on-rotate: false
+#      request-attributes-enabled: false
+      rotate: true
+      suffix: .log
+
+
 
 mac:
   letv: B8:FC:9A:3E:6A:DC
+
+
