@@ -1,3 +1,12 @@
 
 app:
   path: /home/pi/work/build/time.txt
+
+server:
+  tomcat:
+    accesslog:
+      directory: /home/pi/work/build/tomcatLog/
+
+
+
+

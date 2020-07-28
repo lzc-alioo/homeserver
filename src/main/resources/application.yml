@@ -14,12 +14,7 @@ server:
       enabled: true
       directory: /Users/alioo/work/temp/tomcatLog/
       pattern: '%t %a %A %m %U%q %s %D %I %B'  #日志格式
-      #      buffered: false
-#      file-date-format: yyyy-MM-dd
       prefix: access
-#      rename-on-rotate: false
-#      request-attributes-enabled: false
-      rotate: true
       suffix: .log
 
 

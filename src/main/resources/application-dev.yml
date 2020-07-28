@@ -1,3 +1,11 @@
 
 app:
   path: /Users/alioo/work/temp/time.txt
+
+server:
+  tomcat:
+    accesslog:
+      directory: /Users/alioo/work/temp/tomcatLog/
+
+
+
