@@ -114,3 +114,12 @@ java+react开发的轻量级路由管理
 http://192.168.16.198:8081/
 
 
+# 树莓派4B搭建无线路由器
+https://blog.csdn.net/williamyml2010/article/details/102830809
+sudo iptables -F
+sudo iptables -X
+sudo iptables -t nat -APOSTROUTING -o wlan1 -j MASQUERADE
+sudo iptables -A FORWARD -i wlan1 -o wlan0 -m state --state RELATED,ESTABLISHED -j ACCEPT
+sudo iptables -A FORWARD -i wlan0 -o wlan1 -j ACCEPT
+
+

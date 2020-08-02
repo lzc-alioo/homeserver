@@ -2,12 +2,7 @@ package com.alioo.monitor.util;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 
-import javax.servlet.http.HttpServletRequest;
 import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
@@ -96,60 +91,14 @@ public class FileUtil {
     }
 
 
-    public static void writeFile(String path, List<String> list) {
-        if (list == null || list.isEmpty()) {
-            return;
-        }
-
-        FileOutputStream fos = null;
-        try {
-
-
-            fos = new FileOutputStream(path, true);
-            FileChannel channel = fos.getChannel();
-
-            StringBuffer content = new StringBuffer();
-            for (String line : list) {
-                content.append(line).append("/r/n");
-            }
-
-            ByteBuffer buf = ByteBuffer.wrap(content.toString().getBytes());
-            buf.put(content.toString().getBytes());
-            buf.flip();
-            channel.write(buf);
-            channel.close();
-            fos.close();
-        } catch (Exception e) {
-            if (fos != null) {
-                try {
-                    fos.close();
-                } catch (IOException e2) {
-                }
-            }
-        }
-    }
-
-    public static void mkdirs(String path) {
-
-        try {
-            File file = new File(path);
-            if(!file.exists()){
-                file.mkdirs();
-            }
-        } catch (Exception e) {
-             e.printStackTrace();
-        }
-    }
-
-
-    public static void writeFile2(String path, List<String> list) {
+    public static void writeFile(String path, List<String> list,boolean append) {
         if (list == null || list.isEmpty()) {
             return;
         }
 
         FileWriter fw = null;
         try {
-            fw = new FileWriter(path, false);
+            fw = new FileWriter(path, append);
 
             StringBuffer content = new StringBuffer();
             for (String line : list) {
@@ -169,13 +118,52 @@ public class FileUtil {
         }
     }
 
+    public static void mkdirs(String path) {
+
+        try {
+            File file = new File(path);
+            if (!file.exists()) {
+                file.mkdirs();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
+//    public static void writeFile2(String path, List<String> list) {
+//        if (list == null || list.isEmpty()) {
+//            return;
+//        }
+//
+//        FileWriter fw = null;
+//        try {
+//            fw = new FileWriter(path, false);
+//
+//            StringBuffer content = new StringBuffer();
+//            for (String line : list) {
+////                fw.append(line).append("\r");
+//                fw.append(line).append(separator);
+//            }
+//
+//            fw.flush();
+//            fw.close();
+//        } catch (Exception e) {
+//            if (fw != null) {
+//                try {
+//                    fw.close();
+//                } catch (IOException e2) {
+//                }
+//            }
+//        }
+//    }
+
 
     public static void deleteFile(File localFile) {
         if (localFile != null && localFile.exists()) {
             localFile.delete();
         }
     }
-
 
 
 }

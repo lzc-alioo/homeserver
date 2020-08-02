@@ -47,7 +47,7 @@ public class HttpUtil {
                     tmp = ret.substring(0, 100);
                     length = ret.length();
                 }
-                log.info("响应内容length:{},tmp:{}" ,length,tmp);
+//                log.info("响应内容length:{},tmp:{}" ,length,tmp);
                 return ret;
             }
         } catch (ClientProtocolException e) {
@@ -101,7 +101,7 @@ public class HttpUtil {
                 if(ret!=null && ret.length()>100){
                     tmp = ret.substring(0, 100);
                 }
-                log.info("响应内容快照length:{},tmp:{}" ,length,tmp);
+//                log.info("响应内容快照length:{},tmp:{}" ,length,tmp);
                 return ret;
             }
         } catch (ClientProtocolException e) {

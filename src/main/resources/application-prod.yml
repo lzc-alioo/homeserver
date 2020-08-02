@@ -1,6 +1,7 @@
 
 app:
-  path: /home/pi/work/build/time.txt
+  timepath: /home/pi/work/build/time.txt
+  monitorpath: /home/pi/work/build/monitor
 
 server:
   tomcat:

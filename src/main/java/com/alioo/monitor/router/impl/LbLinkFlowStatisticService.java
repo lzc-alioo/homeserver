@@ -1,12 +1,10 @@
 package com.alioo.monitor.router.impl;
 
+import com.alioo.monitor.component.AppConfig;
 import com.alioo.monitor.router.AccessCtrlRequest;
 import com.alioo.monitor.router.FlowStatisticService;
 import com.alioo.monitor.router.TimeComponent;
-import com.alioo.monitor.router.dto.LbStatisticDto;
-import com.alioo.monitor.router.dto.LoginDto;
-import com.alioo.monitor.router.dto.Result;
-import com.alioo.monitor.router.dto.UnavailableTimeDto;
+import com.alioo.monitor.router.dto.*;
 import com.alioo.monitor.util.DateTimeUtil;
 import com.alioo.monitor.util.FileUtil;
 import com.alioo.monitor.util.HttpUtil;
@@ -16,26 +14,23 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
 public class LbLinkFlowStatisticService implements FlowStatisticService {
 
-
-    @Value("${app.path}")
-    private String path;
-
-
-    @Autowired
-    private TimeComponent timeComponent;
+    @Value("${app.monitorpath}")
+    private String monitorpath;
 
     @Value("${mac.letv}")
     private String macLetv;
 
+    @Autowired
+    private TimeComponent timeComponent;
 
     public LbStatisticDto getList() {
 
@@ -181,11 +176,11 @@ public class LbLinkFlowStatisticService implements FlowStatisticService {
             String now = DateTimeUtil.getDateTimeString("HH:mm");
 
             List<UnavailableTimeDto> list = getUnavailableTimeList();
-            log.info("checkNetWork scheduled now:{},tmplist{}" ,now, JsonUtil.toJson(list));
+            log.info("checkNetWork scheduled now:{},tmplist{}", now, JsonUtil.toJson(list));
 
             list.forEach(obj -> {
                 if (now.equals(obj.getStartTimeStr())) {
-                    log.info("checkNetWork scheduled 命中开始时间:{}" , obj.getStartTimeStr());
+                    log.info("checkNetWork scheduled 命中开始时间:{}", obj.getStartTimeStr());
                     AccessCtrlRequest request = new AccessCtrlRequest();
                     request.setMac(macLetv);
                     request.setAct("on");
@@ -194,7 +189,7 @@ public class LbLinkFlowStatisticService implements FlowStatisticService {
                 }
 
                 if (now.equals(obj.getEndTimeStr())) {
-                    log.info("checkNetWork scheduled 命中结束时间:{}" , obj.getEndTimeStr());
+                    log.info("checkNetWork scheduled 命中结束时间:{}", obj.getEndTimeStr());
                     AccessCtrlRequest request = new AccessCtrlRequest();
                     request.setMac(macLetv);
                     request.setAct("off");
@@ -208,6 +203,61 @@ public class LbLinkFlowStatisticService implements FlowStatisticService {
 
 
     }
+
+    public void monitorNetWork() {
+
+        try {
+
+            String now = DateTimeUtil.getDateTimeString("HH:mm");
+
+
+            String token = getToken();
+            LbStatisticDto lbStatisticDto = getStatisticMap(token);
+            List<Terminal> terminals = lbStatisticDto.getTerminals();
+//            log.info("设备信息:{}", JsonUtil.toJson(terminals));
+
+            //新设备加入提醒
+            terminals.forEach(terminal -> {
+                if(terminal.getIp()==null || terminal.getIp().isEmpty()){
+                    return;
+                }
+                if (!AppConfig.whiteMacMap.keySet().contains(terminal.getMac())) {
+                    log.error("新设备加入,terminal:{}", JsonUtil.toJson(terminal));
+                }
+            });
+
+            String realmonitorpath = this.monitorpath + "/" + DateTimeUtil.getDateTimeString("yyyyMMdd") + "/";
+
+            FileUtil.mkdirs(realmonitorpath);
+
+            //流量监控
+            terminals.stream()
+                    .filter(terminal -> {
+                        return true;
+                    })
+                    .forEach(terminal -> {
+                        //format data
+                        StringBuilder sb = new StringBuilder();
+                        sb.append(now).append(",")
+                                .append(terminal.getMac()).append(",")
+                                .append(terminal.getSpeed()).append(",")
+                                .append(terminal.getUpSpeed());
+
+
+                        FileUtil.writeFile(realmonitorpath + terminal.getName(), Arrays.asList(sb.toString()),true);
+
+                    });
+
+
+        } catch (Exception e) {
+            log.error("出现异常了", e);
+        }
+
+
+    }
+
+
+//    private void new
 
 
 }

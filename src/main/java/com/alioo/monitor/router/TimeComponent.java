@@ -15,8 +15,8 @@ import java.util.stream.Collectors;
 public class TimeComponent {
 
 
-    @Value("${app.path}")
-    private String path;
+    @Value("${app.timepath}")
+    private String timepath;
 
     private List<UnavailableTimeDto> list=new ArrayList<>();
 
@@ -27,8 +27,8 @@ public class TimeComponent {
             return list;
         }
 
-        List<String> tmplist = FileUtil.readFile2List(path);
-        log.info("readfile path:" + path, "tmplist=" + tmplist);
+        List<String> tmplist = FileUtil.readFile2List(timepath);
+        log.info("readfile timepath:" + timepath, "tmplist=" + tmplist);
 
         List<UnavailableTimeDto> unavailableTimeDtoList = tmplist.stream()
                 .map(str -> {
@@ -68,8 +68,8 @@ public class TimeComponent {
                 .collect(Collectors.toList());
 
 
-        FileUtil.writeFile2(path, tmplist);
-        log.info("writefile path:" + path, "tmplist=" + tmplist);
+        FileUtil.writeFile(timepath, tmplist,false);
+        log.info("writefile timepath:" + timepath, "tmplist=" + tmplist);
 
         return tmplist.size();
 

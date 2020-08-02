@@ -23,6 +23,12 @@ public class NetSchedule {
         scheduledThreadPoolExecutor.scheduleAtFixedRate(() -> {
             flowStatisticService.checkNetWork();
         }, 10L, 60L, TimeUnit.SECONDS);
+
+
+        scheduledThreadPoolExecutor.scheduleAtFixedRate(() -> {
+            flowStatisticService.monitorNetWork();
+        }, 20L, 60L, TimeUnit.SECONDS);
+
     }
 
 

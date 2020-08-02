@@ -20,4 +20,6 @@ public interface FlowStatisticService {
     public int updateUnavailableTimeList(List<UnavailableTimeDto> list);
 
     public void checkNetWork();
+
+    public void monitorNetWork();
 }
