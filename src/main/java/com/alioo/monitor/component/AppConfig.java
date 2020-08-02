@@ -11,7 +11,7 @@ public class AppConfig {
     static {
         whiteMacMap.put("80:0C:67:1F:69:F7","ali11");
         whiteMacMap.put("DC:A6:32:23:35:D4","work");
-        whiteMacMap.put("48:3C:0C:74:9B:F0","hualei");
+        whiteMacMap.put("48:3C:0C:74:9B:F0","hl");
         whiteMacMap.put("A4:83:E7:3C:3F:3D","ali13");
         whiteMacMap.put("78:0F:77:62:47:E0","kaiguan01");
         whiteMacMap.put("38:F9:D3:2E:B6:DF","ali15");
