@@ -5,11 +5,10 @@ import com.alioo.monitor.router.AccessCtrlRequest;
 import com.alioo.monitor.router.FlowStatisticService;
 import com.alioo.monitor.router.TimeComponent;
 import com.alioo.monitor.router.dto.*;
-import com.alioo.monitor.util.DateTimeUtil;
-import com.alioo.monitor.util.FileUtil;
-import com.alioo.monitor.util.HttpUtil;
-import com.alioo.monitor.util.JsonUtil;
+import com.alioo.monitor.util.*;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -22,6 +21,8 @@ import java.util.Map;
 @Slf4j
 @Service
 public class LbLinkFlowStatisticService implements FlowStatisticService {
+
+    public static Logger NET_LOGGER = LoggerFactory.getLogger("NET");
 
     @Value("${app.monitorpath}")
     private String monitorpath;
@@ -222,7 +223,7 @@ public class LbLinkFlowStatisticService implements FlowStatisticService {
                     return;
                 }
                 if (!AppConfig.whiteMacMap.keySet().contains(terminal.getMac())) {
-                    log.error("新设备加入,terminal:{}", JsonUtil.toJson(terminal));
+                    LogUtil.info(NET_LOGGER,"新设备加入,terminal:{}", JsonUtil.toJson(terminal));
                 }
             });
 
@@ -240,6 +241,7 @@ public class LbLinkFlowStatisticService implements FlowStatisticService {
                         StringBuilder sb = new StringBuilder();
                         sb.append(now).append(",")
                                 .append(terminal.getMac()).append(",")
+                                .append(terminal.getIp()).append(",")
                                 .append(terminal.getSpeed()).append(",")
                                 .append(terminal.getUpSpeed());
 
