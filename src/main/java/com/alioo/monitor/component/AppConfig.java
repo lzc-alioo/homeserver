@@ -7,6 +7,7 @@ import java.util.Map;
 public class AppConfig {
 
     public static Map<String,String> whiteMacMap=new HashMap<>();
+    public static Map<String,Integer> orderdMacMap=new HashMap<>();
 
     static {
         whiteMacMap.put("80:0C:67:1F:69:F7","ali11");
@@ -21,7 +22,12 @@ public class AppConfig {
 //        whiteMacMap.put("E4:A3:2F:2D:29:00","W910");
     }
 
+    static {
+        orderdMacMap.put("B8:FC:9A:3E:6A:DC",100);
+        orderdMacMap.put("DC:A6:32:23:35:D4",90);
+        orderdMacMap.put("48:3C:0C:74:9B:F0",80);
 
+    }
 
 
 

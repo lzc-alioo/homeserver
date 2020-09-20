@@ -13,10 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -104,13 +101,27 @@ public class LbLinkFlowStatisticService implements FlowStatisticService {
 
             //{ "opt": "host_if", "fname": "system", "function": "get", "terminals": [ { "mac": "80:0C:67:1F:69:F7", "flag": "FTFFFFTFFTFF", "ls": 0, "ls_up": 0 }, { "mac": "70:48:0F:52:ED:C1", "flag": "FTFFFFTFFTFF", "ls": 0, "ls_up": 0 }, { "mac": "DC:A6:32:23:35:D4", "flag": "FTFFFFTFFTFF", "ls": 0, "ls_up": 0 }, { "mac": "48:3C:0C:74:9B:F0", "flag": "FTFFFFTFFTFF", "ls": 0, "ls_up": 0 }, { "mac": "38:F9:D3:2E:B6:DF", "flag": "TTFFFFTFFTFF", "ls": 0, "ls_up": 0 }, { "mac": "78:0F:77:62:47:E0", "flag": "FTFFFFTFFTFF", "ls": 0, "ls_up": 0 }, { "mac": "A4:83:E7:3C:3F:3D", "flag": "FFFFFFTFFTFF", "ls": 0, "ls_up": 0 }, { "mac": "B8:FC:9A:3E:6A:DC", "flag": "FFFFFFFFFTFF", "ls": 0, "ls_up": 0 }, { "mac": "E4:A3:2F:2D:29:00", "flag": "FFFFFFFFFTFF", "ls": 0, "ls_up": 0 } ], "error": 0 }%                                                                                                                                                                           alioo@alioo15 ~ %
             LbStatisticDto lbStatisticDto = JsonUtil.fromJson(ret, LbStatisticDto.class);
+            sortTerminals(lbStatisticDto);
             log.info("getStatisticMap信息：{}", JsonUtil.toJson(lbStatisticDto));
+
             return lbStatisticDto;
 
         } catch (Exception e) {
             log.error("获取统计数据时出现异常", e);
         }
         return null;
+    }
+
+    private void sortTerminals(LbStatisticDto lbStatisticDto) {
+        if (lbStatisticDto == null || lbStatisticDto.getTerminals() == null || lbStatisticDto.getTerminals().isEmpty()) {
+            return;
+        }
+
+        lbStatisticDto.getTerminals().forEach(terminal -> {
+            terminal.setOrder(AppConfig.orderdMacMap.getOrDefault(terminal.getMac(),10000));
+        });
+
+        Collections.sort(lbStatisticDto.getTerminals());
     }
 
 
@@ -219,11 +230,11 @@ public class LbLinkFlowStatisticService implements FlowStatisticService {
 
             //新设备加入提醒
             terminals.forEach(terminal -> {
-                if(terminal.getIp()==null || terminal.getIp().isEmpty()){
+                if (terminal.getIp() == null || terminal.getIp().isEmpty()) {
                     return;
                 }
-                if (!AppConfig.whiteMacMap.keySet().contains(terminal.getMac())) {
-                    LogUtil.info(NET_LOGGER,"新设备加入,terminal:{}", JsonUtil.toJson(terminal));
+                if (terminal.getIp()!=null && !AppConfig.whiteMacMap.keySet().contains(terminal.getMac())) {
+                    LogUtil.info(NET_LOGGER, "新设备加入,terminal:{}", JsonUtil.toJson(terminal));
                 }
             });
 
@@ -246,7 +257,7 @@ public class LbLinkFlowStatisticService implements FlowStatisticService {
                                 .append(terminal.getUpSpeed());
 
 
-                        FileUtil.writeFile(realmonitorpath + terminal.getName(), Arrays.asList(sb.toString()),true);
+                        FileUtil.writeFile(realmonitorpath + terminal.getName(), Arrays.asList(sb.toString()), true);
 
                     });
 

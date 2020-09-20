@@ -6,7 +6,7 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class Terminal {
+public class Terminal implements Comparable<Terminal>{
 
 //"mac": "80:0C:67:1F:69:F7",
 //"ip": "192.168.16.225",
@@ -49,4 +49,13 @@ public class Terminal {
     private int sig;
 
     private List<String> apps;
+
+    private int order;
+
+    @Override
+    public int compareTo(Terminal other) {
+
+
+        return this.getOrder()-other.getOrder();
+    }
 }
