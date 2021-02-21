@@ -23,8 +23,9 @@ public class AppConfig {
     }
 
     static {
-        orderdMacMap.put("B8:FC:9A:3E:6A:DC",100);
-        orderdMacMap.put("DC:A6:32:23:35:D4",90);
+        orderdMacMap.put("B8:FC:9A:3E:6A:DC",10);
+        orderdMacMap.put("70:48:0F:52:ED:C1",15);
+        orderdMacMap.put("DC:A6:32:23:35:D4",20);
         orderdMacMap.put("48:3C:0C:74:9B:F0",80);
 
     }
