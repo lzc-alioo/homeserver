@@ -20,7 +20,7 @@ while [ -f $PATH_BASE/$FILE_OUTPUT ]
 do
     current=`date +%Y-%m-%d\ %H:%M`
     result=`grep "$current" $PATH_BASE/$FILE_OUTPUT | grep "Started HomeserverApplication"`
-    if [[ "$result" != "" ]]
+    if [ "x$result" != "x" ]
     then
         echo "$(date "+%Y-%m-%d %H:%M:%S") springboot start ..."
         break
