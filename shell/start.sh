@@ -7,7 +7,7 @@ PATH_BASE=`dirname $0`
 RUN_JAR=homeserver-0.0.1-SNAPSHOT.jar
 FILE_OUTPUT=logs/`date +%Y%m%d%H%M%S`.log
 
-echo "$(date "+%Y-%m-%d %H:%M:%S") $RUN_JAR start..."
+echo "$(date "+%Y-%m-%d %H:%M:%S") $RUN_JAR start... you can see log:$LOG_FILE"
 
 cd $PATH_BASE
 #java -jar $PATH_BASE/homeserver-0.0.1-SNAPSHOT.jar &

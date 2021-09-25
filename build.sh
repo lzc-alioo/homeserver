@@ -1,4 +1,4 @@
-mvn clean package
+mvn clean package -DskipTests=true
 
 rm -rf build
 mkdir build
