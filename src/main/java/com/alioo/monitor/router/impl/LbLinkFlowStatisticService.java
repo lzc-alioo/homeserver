@@ -13,7 +13,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
 import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -118,7 +121,7 @@ public class LbLinkFlowStatisticService implements FlowStatisticService {
         }
 
         lbStatisticDto.getTerminals().forEach(terminal -> {
-            terminal.setOrder(AppConfig.orderdMacMap.getOrDefault(terminal.getMac(),10000));
+            terminal.setOrder(AppConfig.orderdMacMap.getOrDefault(terminal.getMac(), 10000));
         });
 
         Collections.sort(lbStatisticDto.getTerminals());
@@ -233,7 +236,7 @@ public class LbLinkFlowStatisticService implements FlowStatisticService {
                 if (terminal.getIp() == null || terminal.getIp().isEmpty()) {
                     return;
                 }
-                if (terminal.getIp()!=null && !AppConfig.whiteMacMap.keySet().contains(terminal.getMac())) {
+                if (terminal.getIp() != null && !AppConfig.whiteMacMap.keySet().contains(terminal.getMac())) {
                     LogUtil.info(NET_LOGGER, "新设备加入,terminal:{}", JsonUtil.toJson(terminal));
                 }
             });
@@ -270,7 +273,101 @@ public class LbLinkFlowStatisticService implements FlowStatisticService {
     }
 
 
-//    private void new
+    /**
+     * @param datestr     示例：20211002
+     * @param machineName
+     * @return
+     */
+    public List<NetWorkDataDto> netWorkData(String datestr, String machineName) {
 
+        String realmonitorpath = this.monitorpath + "/" + datestr + "/";
+
+        String filepath = realmonitorpath + machineName;
+
+        File file = new File(filepath);
+        if (!file.exists()) {
+            return new ArrayList<>();
+        }
+
+
+        List<String> list = FileUtil.readFile2List(filepath);
+
+        Map<String, List<String>> gmap = list.stream().collect(
+                Collectors.groupingBy(
+                        str -> getTime5Str(str),
+                        LinkedHashMap::new,
+                        Collectors.toList()
+                )
+        );
+
+        log.info("查询网络数据datestr:{}, machineName:{}, gmap:{}", datestr, machineName, JsonUtil.toJson(gmap));
+
+
+        List<NetWorkDataDto>  list2 = getNetWorkDataList(gmap);
+
+        log.info("查询网络数据处理后 datestr:{}, machineName:{}, gmap2:{}", datestr, machineName, JsonUtil.toJson(list2));
+
+        return list2;
+
+    }
+
+
+    private String getTime5Str(String str) {
+        String time = str.split(",")[0];
+
+        String[] hhMM = time.split(":");
+
+        int minute = Integer.parseInt(hhMM[1]);
+
+        //先除5 后乘以5 的目的是为去了小数
+        int minute5 = minute / 5 * 5;
+
+        String minute5Str = minute5 < 10 ? "0" + minute5 : "" + minute5;
+
+        return hhMM[0] +":"+ minute5Str;
+
+    }
+
+    private  List<NetWorkDataDto> getNetWorkDataList(Map<String, List<String>> gmap) {
+        List<NetWorkDataDto> list2 = new ArrayList<>();
+
+        for (int hh = 0; hh < 24; hh++) {
+            String hhStr = hh < 10 ? "0" + hh : "" + hh;
+
+            for (int minute5 = 0; minute5 < 60; minute5 = minute5 + 5) {
+                String minute5Str = minute5 < 10 ? "0" + minute5 : "" + minute5;
+
+                String timeStr = hhStr + ":" + minute5Str;
+
+
+                List<String> list = gmap.get(timeStr);
+
+                NetWorkDataDto netWorkDataDto = getNetWorkDataDto(timeStr, list);
+                list2.add(netWorkDataDto);
+
+            }
+
+        }
+
+
+        return list2;
+    }
+
+
+    private NetWorkDataDto getNetWorkDataDto(String timeStr, List<String> list) {
+        if (list == null || list.isEmpty()) {
+            return new NetWorkDataDto(timeStr, 0);
+        }
+
+        Long netSum = list.stream().map(str -> {
+            String arr[] = str.split(",");
+            long net = Long.parseLong(arr[3]) + Long.parseLong(arr[4]);
+            return net;
+
+        }).reduce(Long::sum).get();
+
+        return new NetWorkDataDto(timeStr, netSum);
+
+    }
 
 }
