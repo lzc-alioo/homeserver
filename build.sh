@@ -3,6 +3,8 @@ mvn clean package -DskipTests=true
 rm -rf build
 mkdir build
 
+rm -rf logs/*
+
 path_target=/Users/alioo/work/gitstudy/homeserver/target/
 path_output=/Users/alioo/work/gitstudy/homeserver/build/
 
