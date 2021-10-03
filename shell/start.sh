@@ -24,7 +24,6 @@ do
     echo "cmd:grep \"$current\" $PATH_BASE/$LOG_FILE | grep \"Started Application\""
     result=`grep "$current" $PATH_BASE/$LOG_FILE | grep "Started Application"`
 
-
     if [ "x$result" != "x" ]
     then
         echo "$(date "+%Y-%m-%d %H:%M:%S") springboot start ..."
