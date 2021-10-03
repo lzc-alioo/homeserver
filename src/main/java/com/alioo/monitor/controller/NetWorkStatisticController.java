@@ -1,11 +1,11 @@
 package com.alioo.monitor.controller;
 
-import com.alioo.monitor.router.AccessCtrlRequest;
-import com.alioo.monitor.router.FlowStatisticService;
-import com.alioo.monitor.router.NetworkDataRequest;
-import com.alioo.monitor.router.dto.LbStatisticDto;
-import com.alioo.monitor.router.dto.NetWorkDataDto;
-import com.alioo.monitor.router.dto.UnavailableTimeDto;
+import com.alioo.monitor.controller.dto.AccessCtrlRequest;
+import com.alioo.monitor.service.NetWorkStatisticService;
+import com.alioo.monitor.controller.dto.NetWorkDataRequest;
+import com.alioo.monitor.service.dto.LbStatisticDto;
+import com.alioo.monitor.service.dto.NetWorkDataDto;
+import com.alioo.monitor.service.dto.UnavailableTimeDto;
 import com.alioo.monitor.util.DateTimeUtil;
 import com.alioo.monitor.util.JsonUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -20,36 +20,36 @@ import java.util.List;
 @Slf4j
 @RestController
 @RequestMapping("statistic")
-public class StatisticController {
+public class NetWorkStatisticController {
 
     @Autowired
-    private FlowStatisticService flowStatisticService;
+    private NetWorkStatisticService netWorkStatisticService;
 
-    public StatisticController() {
+    public NetWorkStatisticController() {
         System.out.println("StatisticController...");
     }
 
-    @RequestMapping("/getList")
-    public LbStatisticDto getList() {
+    @RequestMapping("/getMachineList")
+    public LbStatisticDto getMachineList() {
         System.out.println("statistic/getList...");
 
 
-        LbStatisticDto list = flowStatisticService.getList();
+        LbStatisticDto list = netWorkStatisticService.getMachineList();
         return list;
     }
 
     /**
      * @return
      */
-    @RequestMapping("/accessCtrl")
-    public LbStatisticDto accessCtrl(AccessCtrlRequest request) {
-        System.out.println("main/accessCtrl...request:" + JsonUtil.toJson(request));
+    @RequestMapping("/setNetWorkSwitch")
+    public LbStatisticDto setNetWorkSwitch(AccessCtrlRequest request) {
+        System.out.println("statistic/setNetWorkSwitch...request:" + JsonUtil.toJson(request));
         if (request.getMac() == null) {
             return null;
         }
-        boolean flag = flowStatisticService.accessCtrl(request);
+        boolean flag = netWorkStatisticService.setNetWorkSwitch(request);
         log.info("设置网络结果request:{},flag:{}", JsonUtil.toJson(request), flag);
-        return getList();
+        return getMachineList();
     }
 
 
@@ -60,7 +60,7 @@ public class StatisticController {
     public List<UnavailableTimeDto> getUnavailableTimeList() {
         System.out.println("main/getUnavailableTimeList..");
 
-        List<UnavailableTimeDto> list = flowStatisticService.getUnavailableTimeList();
+        List<UnavailableTimeDto> list = netWorkStatisticService.getUnavailableTimeList();
         log.info("查询禁用时间 list:{}", list);
         return list;
     }
@@ -73,15 +73,15 @@ public class StatisticController {
     public List<UnavailableTimeDto> updateUnavailableTimeList(@RequestBody List<UnavailableTimeDto> list) {
         System.out.println("main/updateUnavailableTimeList...list:" + JsonUtil.toJson(list));
 
-        flowStatisticService.updateUnavailableTimeList(list);
+        netWorkStatisticService.updateUnavailableTimeList(list);
 
         log.info("设置禁用时间 list:{}", list);
         return getUnavailableTimeList();
     }
 
 
-    @RequestMapping("/netWorkData")
-    public List<NetWorkDataDto> netWorkData(NetworkDataRequest request) {
+    @RequestMapping("/getNetWorkData")
+    public List<NetWorkDataDto> getNetWorkData(NetWorkDataRequest request) {
 
 
         String datestr = request.getDatestr();
@@ -95,7 +95,7 @@ public class StatisticController {
         }
 
 
-        List<NetWorkDataDto> list = flowStatisticService.netWorkData(datestr, machineName);
+        List<NetWorkDataDto> list = netWorkStatisticService.getNetWorkData(datestr, machineName);
 
         return list;
 

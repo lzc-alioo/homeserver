@@ -1,10 +1,10 @@
-package com.alioo.monitor.router.impl;
+package com.alioo.monitor.service.impl;
 
-import com.alioo.monitor.component.AppConfig;
-import com.alioo.monitor.router.AccessCtrlRequest;
-import com.alioo.monitor.router.FlowStatisticService;
-import com.alioo.monitor.router.TimeComponent;
-import com.alioo.monitor.router.dto.*;
+import com.alioo.monitor.constant.AppConfig;
+import com.alioo.monitor.controller.dto.AccessCtrlRequest;
+import com.alioo.monitor.service.NetWorkStatisticService;
+import com.alioo.monitor.service.component.UnavailableTimeComponent;
+import com.alioo.monitor.service.dto.*;
 import com.alioo.monitor.util.*;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
@@ -15,12 +15,11 @@ import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.util.*;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Slf4j
 @Service
-public class LbLinkFlowStatisticService implements FlowStatisticService {
+public class LbLinkNetWorkStatisticServiceImpl implements NetWorkStatisticService {
 
     public static Logger NET_LOGGER = LoggerFactory.getLogger("NET");
 
@@ -31,31 +30,13 @@ public class LbLinkFlowStatisticService implements FlowStatisticService {
     private String macLetv;
 
     @Autowired
-    private TimeComponent timeComponent;
-
-    public LbStatisticDto getList() {
-
-        String token = getToken();
-        LbStatisticDto lbStatisticDto = getStatisticMap(token);
-
-        return lbStatisticDto;
-    }
+    private UnavailableTimeComponent unavailableTimeComponent;
 
 
     public String getToken() {
         try {
             String myurl = "http://192.168.16.1/protocol.csp?fname=system&opt=login&function=set&usrid=f11fcbaac530c673a91c6022a49c2219";
-            Map<String, String> headers = new LinkedHashMap<>();
-            headers.put("Connection", "keep-alive");
-//            headers.put("Content-Length", "0");
-            headers.put("Accept", "application/json, text/javascript, */*; q=0.01");
-            headers.put("X-Requested-With", "XMLHttpRequest");
-            headers.put("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.129 Safari/537.36");
-            headers.put("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
-            headers.put("Origin", "http://192.168.16.1");
-            headers.put("Referer", "http://192.168.16.1");
-            headers.put("Accept-Language", "zh-CN,zh;q=0.9,en;q=0.8");
-
+            Map<String, String> headers = getHeaderMap();
             Map<String, String> datas = new LinkedHashMap<>();
 
             String ret = HttpUtil.post(myurl, headers, datas);
@@ -64,7 +45,7 @@ public class LbLinkFlowStatisticService implements FlowStatisticService {
             }
 
             //{ "opt": "login", "fname": "system", "function": "set", "token": "B65FC5DC95A91524866BBC91B9C20625", "error": 0 }
-            LoginDto loginDto = JsonUtil.fromJson(ret, LoginDto.class);
+            TokenDto loginDto = JsonUtil.fromJson(ret, TokenDto.class);
             log.info("token信息：{}", JsonUtil.toJson(loginDto));
 
             if (loginDto != null) {
@@ -76,20 +57,21 @@ public class LbLinkFlowStatisticService implements FlowStatisticService {
         return null;
     }
 
-    private LbStatisticDto getStatisticMap(String token) {
+
+    public LbStatisticDto getMachineList() {
+
+        String token = getToken();
+        LbStatisticDto lbStatisticDto = getMachineList(token);
+
+        return lbStatisticDto;
+    }
+
+
+    private LbStatisticDto getMachineList(String token) {
         try {
 
             String myurl = "http://192.168.16.1/protocol.csp?token=" + token;
-            Map<String, String> headers = new LinkedHashMap<>();
-            headers.put("Connection", "keep-alive");
-            headers.put("Accept", "application/json, text/javascript, */*; q=0.01");
-            headers.put("X-Requested-With", "XMLHttpRequest");
-            headers.put("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.129 Safari/537.36");
-            headers.put("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
-            headers.put("Origin", "http://192.168.16.1");
-            headers.put("Referer", "http://192.168.16.1/user/index.html?tt=1593269725937");
-            headers.put("Accept-Language", "zh-CN,zh;q=0.9,en;q=0.8");
-            headers.put("Cookie", "lstatus=true; token=" + token);
+            Map<String, String> headers = getHeaderMap();
 
             Map<String, String> datas = new LinkedHashMap<>();
             datas.put("fname", "system");
@@ -105,7 +87,7 @@ public class LbLinkFlowStatisticService implements FlowStatisticService {
             //{ "opt": "host_if", "fname": "system", "function": "get", "terminals": [ { "mac": "80:0C:67:1F:69:F7", "flag": "FTFFFFTFFTFF", "ls": 0, "ls_up": 0 }, { "mac": "70:48:0F:52:ED:C1", "flag": "FTFFFFTFFTFF", "ls": 0, "ls_up": 0 }, { "mac": "DC:A6:32:23:35:D4", "flag": "FTFFFFTFFTFF", "ls": 0, "ls_up": 0 }, { "mac": "48:3C:0C:74:9B:F0", "flag": "FTFFFFTFFTFF", "ls": 0, "ls_up": 0 }, { "mac": "38:F9:D3:2E:B6:DF", "flag": "TTFFFFTFFTFF", "ls": 0, "ls_up": 0 }, { "mac": "78:0F:77:62:47:E0", "flag": "FTFFFFTFFTFF", "ls": 0, "ls_up": 0 }, { "mac": "A4:83:E7:3C:3F:3D", "flag": "FFFFFFTFFTFF", "ls": 0, "ls_up": 0 }, { "mac": "B8:FC:9A:3E:6A:DC", "flag": "FFFFFFFFFTFF", "ls": 0, "ls_up": 0 }, { "mac": "E4:A3:2F:2D:29:00", "flag": "FFFFFFFFFTFF", "ls": 0, "ls_up": 0 } ], "error": 0 }%                                                                                                                                                                           alioo@alioo15 ~ %
             LbStatisticDto lbStatisticDto = JsonUtil.fromJson(ret, LbStatisticDto.class);
             sortTerminals(lbStatisticDto);
-            log.info("getStatisticMap信息：{}", JsonUtil.toJson(lbStatisticDto));
+            log.info("lbStatisticDto信息：{}", JsonUtil.toJson(lbStatisticDto));
 
             return lbStatisticDto;
 
@@ -128,24 +110,14 @@ public class LbLinkFlowStatisticService implements FlowStatisticService {
     }
 
 
-    public boolean accessCtrl(AccessCtrlRequest request) {
+    public boolean setNetWorkSwitch(AccessCtrlRequest request) {
 
         try {
             String token = getToken();
 
 
             String myurl = "http://192.168.16.1/protocol.csp?token=" + token + "&fname=net&opt=host_black&function=set&mac=" + request.getMac() + "&act=" + request.getAct();
-            Map<String, String> headers = new LinkedHashMap<>();
-            headers.put("Connection", "keep-alive");
-            headers.put("Accept", "application/json, text/javascript, */*; q=0.01");
-            headers.put("X-Requested-With", "XMLHttpRequest");
-            headers.put("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.129 Safari/537.36");
-            headers.put("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
-            headers.put("Origin", "http://192.168.16.1");
-            headers.put("Referer", "http://192.168.16.1/user/index.html?tt=1593269725937");
-            headers.put("Accept-Language", "zh-CN,zh;q=0.9,en;q=0.8");
-            headers.put("Cookie", "lstatus=true; token=" + token);
-
+            Map<String, String> headers = getHeaderMap();
             Map<String, String> datas = new LinkedHashMap<>();
 
             String ret = HttpUtil.post(myurl, headers, datas);
@@ -169,7 +141,7 @@ public class LbLinkFlowStatisticService implements FlowStatisticService {
 
     public List<UnavailableTimeDto> getUnavailableTimeList() {
 
-        List<UnavailableTimeDto> list = timeComponent.getUnavailableTimeList();
+        List<UnavailableTimeDto> list = unavailableTimeComponent.getUnavailableTimeList();
 
         return list;
 
@@ -178,7 +150,7 @@ public class LbLinkFlowStatisticService implements FlowStatisticService {
 
     public int updateUnavailableTimeList(List<UnavailableTimeDto> list) {
 
-        int result = timeComponent.updateUnavailableTimeList(list);
+        int result = unavailableTimeComponent.updateUnavailableTimeList(list);
 
         return result;
 
@@ -191,7 +163,7 @@ public class LbLinkFlowStatisticService implements FlowStatisticService {
             String now = DateTimeUtil.getDateTimeString("HH:mm");
 
             List<UnavailableTimeDto> list = getUnavailableTimeList();
-            log.info("checkNetWork scheduled now:{},tmplist{}", now, JsonUtil.toJson(list));
+            log.info("scheduled checkNetWork now:{},tmplist{}", now, JsonUtil.toJson(list));
 
             list.forEach(obj -> {
                 if (now.equals(obj.getStartTimeStr())) {
@@ -199,7 +171,7 @@ public class LbLinkFlowStatisticService implements FlowStatisticService {
                     AccessCtrlRequest request = new AccessCtrlRequest();
                     request.setMac(macLetv);
                     request.setAct("on");
-                    accessCtrl(request);
+                    setNetWorkSwitch(request);
                     return;
                 }
 
@@ -208,7 +180,7 @@ public class LbLinkFlowStatisticService implements FlowStatisticService {
                     AccessCtrlRequest request = new AccessCtrlRequest();
                     request.setMac(macLetv);
                     request.setAct("off");
-                    accessCtrl(request);
+                    setNetWorkSwitch(request);
                     return;
                 }
             });
@@ -222,24 +194,23 @@ public class LbLinkFlowStatisticService implements FlowStatisticService {
     public void monitorNetWork() {
 
         try {
-
             String now = DateTimeUtil.getDateTimeString("HH:mm");
 
+            log.info("scheduled checkNetWork now:{}", now);
 
             String token = getToken();
-            LbStatisticDto lbStatisticDto = getStatisticMap(token);
+            LbStatisticDto lbStatisticDto = getMachineList(token);
             List<Terminal> terminals = lbStatisticDto.getTerminals();
-//            log.info("设备信息:{}", JsonUtil.toJson(terminals));
 
-            //新设备加入提醒
-            terminals.forEach(terminal -> {
-                if (terminal.getIp() == null || terminal.getIp().isEmpty()) {
-                    return;
-                }
-                if (terminal.getIp() != null && !AppConfig.whiteMacMap.keySet().contains(terminal.getMac())) {
-                    LogUtil.info(NET_LOGGER, "新设备加入,terminal:{}", JsonUtil.toJson(terminal));
-                }
-            });
+//            //新设备加入提醒
+//            terminals.forEach(terminal -> {
+//                if (terminal.getIp() == null || terminal.getIp().isEmpty()) {
+//                    return;
+//                }
+//                if (terminal.getIp() != null && !AppConfig.whiteMacMap.keySet().contains(terminal.getMac())) {
+//                    LogUtil.info(NET_LOGGER, "新设备加入,terminal:{}", JsonUtil.toJson(terminal));
+//                }
+//            });
 
             String realmonitorpath = this.monitorpath + "/" + DateTimeUtil.getDateTimeString("yyyyMMdd") + "/";
 
@@ -266,10 +237,23 @@ public class LbLinkFlowStatisticService implements FlowStatisticService {
 
 
         } catch (Exception e) {
-            log.error("出现异常了", e);
+            log.error("monitorNetWork出现异常了", e);
         }
 
 
+    }
+
+    private Map<String, String> getHeaderMap() {
+        Map<String, String> headers = new LinkedHashMap<>();
+        headers.put("Connection", "keep-alive");
+        headers.put("Accept", "application/json, text/javascript, */*; q=0.01");
+        headers.put("X-Requested-With", "XMLHttpRequest");
+        headers.put("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.129 Safari/537.36");
+        headers.put("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
+        headers.put("Origin", "http://192.168.16.1");
+        headers.put("Accept-Language", "zh-CN,zh;q=0.9,en;q=0.8");
+
+        return headers;
     }
 
 
@@ -278,7 +262,7 @@ public class LbLinkFlowStatisticService implements FlowStatisticService {
      * @param machineName
      * @return
      */
-    public List<NetWorkDataDto> netWorkData(String datestr, String machineName) {
+    public List<NetWorkDataDto> getNetWorkData(String datestr, String machineName) {
 
         String realmonitorpath = this.monitorpath + "/" + datestr + "/";
 
@@ -303,7 +287,7 @@ public class LbLinkFlowStatisticService implements FlowStatisticService {
         log.info("查询网络数据datestr:{}, machineName:{}, gmap:{}", datestr, machineName, JsonUtil.toJson(gmap));
 
 
-        List<NetWorkDataDto>  list2 = getNetWorkDataList(gmap);
+        List<NetWorkDataDto> list2 = getNetWorkDataList(gmap);
 
         log.info("查询网络数据处理后 datestr:{}, machineName:{}, gmap2:{}", datestr, machineName, JsonUtil.toJson(list2));
 
@@ -324,11 +308,11 @@ public class LbLinkFlowStatisticService implements FlowStatisticService {
 
         String minute5Str = minute5 < 10 ? "0" + minute5 : "" + minute5;
 
-        return hhMM[0] +":"+ minute5Str;
+        return hhMM[0] + ":" + minute5Str;
 
     }
 
-    private  List<NetWorkDataDto> getNetWorkDataList(Map<String, List<String>> gmap) {
+    private List<NetWorkDataDto> getNetWorkDataList(Map<String, List<String>> gmap) {
         List<NetWorkDataDto> list2 = new ArrayList<>();
 
         for (int hh = 0; hh < 24; hh++) {

@@ -1,7 +1,7 @@
-//package com.alioo.monitor.router.impl;
+//package com.alioo.monitor.service.impl;
 //
-//import com.alioo.monitor.router.FlowStatisticService;
-//import com.alioo.monitor.router.dto.FlowStatisticDto;
+//import com.alioo.monitor.service.NetWorkStatisticService;
+//import com.alioo.monitor.service.dto.FlowStatisticDto;
 //import com.alioo.monitor.util.HttpUtil;
 //import lombok.extern.slf4j.Slf4j;
 //import org.springframework.stereotype.Service;
@@ -13,7 +13,7 @@
 //
 //@Slf4j
 ////@Service
-//public class TpLinkFlowStatisticService implements FlowStatisticService {
+//public class TpLinkFlowStatisticService implements NetWorkStatisticService {
 //
 //    public List<FlowStatisticDto> getList() {
 //
@@ -250,7 +250,7 @@
 //    }
 //
 //
-//    public boolean accessCtrl(FlowStatisticDto dto) {
+//    public boolean setNetWorkSwitch(FlowStatisticDto dto) {
 //        Map<String, Integer> ctrlmap = new HashMap<>();
 //        ctrlmap.put("ali15", 0);
 //        ctrlmap.put("leshi", 1);

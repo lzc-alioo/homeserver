@@ -1,10 +1,9 @@
-package com.alioo.monitor.router.dto;
+package com.alioo.monitor.service.dto;
 
 import com.alioo.monitor.util.DateTimeUtil;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
 
 @Data
 @NoArgsConstructor

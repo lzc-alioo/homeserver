@@ -1,4 +1,4 @@
-package com.alioo.monitor.router.dto;
+package com.alioo.monitor.service.dto;
 
 
 import lombok.Data;

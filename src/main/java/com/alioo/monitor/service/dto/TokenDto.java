@@ -1,9 +1,9 @@
-package com.alioo.monitor.router.dto;
+package com.alioo.monitor.service.dto;
 
 import lombok.Data;
 
 @Data
-public class LoginDto {
+public class TokenDto {
 
     //{ "opt": "login", "fname": "system", "function": "set", "token": "B65FC5DC95A91524866BBC91B9C20625", "error": 0 }
     private String opt;

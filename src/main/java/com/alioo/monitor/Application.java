@@ -12,9 +12,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import java.net.InetSocketAddress;
 
 @SpringBootApplication
-public class HomeserverApplication implements CommandLineRunner {
+public class Application implements CommandLineRunner {
 
-    private static final Logger logger = LoggerFactory.getLogger(HomeserverApplication.class);
+    private static final Logger logger = LoggerFactory.getLogger(Application.class);
 
     @Value("${netty.port}")
     private int port;
@@ -26,10 +26,10 @@ public class HomeserverApplication implements CommandLineRunner {
     private NettyServer server;
 
 //    @Autowired
-//    private FlowStatisticService flowStatisticService;
+//    private NetWorkStatisticService flowStatisticService;
 
     public static void main(String[] args) {
-        SpringApplication.run(HomeserverApplication.class, args);
+        SpringApplication.run(Application.class, args);
     }
 
     @Override

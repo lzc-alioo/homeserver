@@ -1,4 +1,4 @@
-package com.alioo.monitor.component;
+package com.alioo.monitor.constant;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -7,7 +7,6 @@ import java.util.Map;
 public class AppConfig {
 
     public static Map<String,String> whiteMacMap=new HashMap<>();
-    public static Map<String,Integer> orderdMacMap=new HashMap<>();
 
     static {
         whiteMacMap.put("80:0C:67:1F:69:F7","ali11");
@@ -22,6 +21,9 @@ public class AppConfig {
 //        whiteMacMap.put("E4:A3:2F:2D:29:00","W910");
     }
 
+
+    public static Map<String,Integer> orderdMacMap=new HashMap<>();
+
     public static int idx=1;
 
     static {
@@ -35,7 +37,6 @@ public class AppConfig {
         orderdMacMap.put("A4:83:E7:3C:3F:3D",idx++); //E097815-BJ
 
     }
-
 
 
 }

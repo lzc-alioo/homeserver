@@ -1,6 +1,6 @@
-package com.alioo.monitor.router;
+package com.alioo.monitor.service.component;
 
-import com.alioo.monitor.router.dto.UnavailableTimeDto;
+import com.alioo.monitor.service.dto.UnavailableTimeDto;
 import com.alioo.monitor.util.FileUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Component
-public class TimeComponent {
+public class UnavailableTimeComponent {
 
 
     @Value("${app.timepath}")

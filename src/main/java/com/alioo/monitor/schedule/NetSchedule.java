@@ -1,7 +1,7 @@
 package com.alioo.monitor.schedule;
 
 
-import com.alioo.monitor.router.FlowStatisticService;
+import com.alioo.monitor.service.NetWorkStatisticService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -14,7 +14,7 @@ import java.util.concurrent.TimeUnit;
 public class NetSchedule {
 
     @Autowired
-    private FlowStatisticService flowStatisticService;
+    private NetWorkStatisticService flowStatisticService;
 
     private ScheduledThreadPoolExecutor scheduledThreadPoolExecutor = new ScheduledThreadPoolExecutor(5, new ThreadPoolExecutor.AbortPolicy());
 
