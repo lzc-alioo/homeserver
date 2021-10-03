@@ -17,11 +17,14 @@ cmd="java -jar $PATH_BASE/homeserver-0.0.1-SNAPSHOT.jar --spring.profiles.active
 nohup $cmd >> $PATH_BASE/$LOG_FILE 2>&1  &
 
 # 查询日志检测java程序是否启动成功
-echo "$(date "+%Y-%m-%d %H:%M:%S") checking if started ..."
+#echo "$(date "+%Y-%m-%d %H:%M:%S") checking if started ..."
 while [ -f $PATH_BASE/$LOG_FILE ]
 do
     current=`date +%Y-%m-%d\ %H:%M`
-    result=`grep "$current" $PATH_BASE/$LOG_FILE | grep "Started HomeserverApplication"`
+    echo "cmd:grep \"$current\" $PATH_BASE/$LOG_FILE | grep \"Started Application\""
+    result=`grep "$current" $PATH_BASE/$LOG_FILE | grep "Started Application"`
+
+
     if [ "x$result" != "x" ]
     then
         echo "$(date "+%Y-%m-%d %H:%M:%S") springboot start ..."
