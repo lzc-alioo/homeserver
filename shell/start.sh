@@ -10,7 +10,7 @@ LOG_FILE=logs/`date +%Y%m%d%H%M%S`.log
 echo "$(date "+%Y-%m-%d %H:%M:%S") $RUN_JAR start... you can see log:$LOG_FILE"
 
 cd $PATH_BASE
-sudo chown -R pi:pi $PATH_BASE/logs/*.log
+sudo chown -R pi:pi $PATH_BASE/*
 
 #java -jar $PATH_BASE/homeserver-0.0.1-SNAPSHOT.jar &
 cmd="java -jar $PATH_BASE/homeserver-0.0.1-SNAPSHOT.jar --spring.profiles.active=prod"
