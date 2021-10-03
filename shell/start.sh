@@ -1,4 +1,4 @@
-
+#!/usr/bin/env bash
 # /home/pi/work/build/start.sh add to /etc/rc.local
 
 sleep 5
@@ -17,7 +17,8 @@ cmd="java -jar $PATH_BASE/homeserver-0.0.1-SNAPSHOT.jar --spring.profiles.active
 nohup $cmd >> $PATH_BASE/$LOG_FILE 2>&1  &
 
 # 查询日志检测java程序是否启动成功
-#echo "$(date "+%Y-%m-%d %H:%M:%S") checking if started ..."
+echo "$(date "+%Y-%m-%d %H:%M:%S") checking if started ..."
+
 while [ -f $PATH_BASE/$LOG_FILE ]
 do
     current=`date +%Y-%m-%d\ %H:%M`
