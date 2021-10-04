@@ -315,6 +315,10 @@ public class LbLinkNetWorkStatisticServiceImpl implements NetWorkStatisticServic
     private List<NetWorkDataDto> getNetWorkDataList(Map<String, List<String>> gmap) {
         List<NetWorkDataDto> list2 = new ArrayList<>();
 
+        String now = DateTimeUtil.getDateTimeString("HH:mm");
+//        int hhMax = Integer.parseInt(now.substring(0, 2));
+//        int minuteMax = Integer.parseInt(now.substring(2, 4));
+
         for (int hh = 0; hh < 24; hh++) {
             String hhStr = hh < 10 ? "0" + hh : "" + hh;
 
@@ -322,6 +326,9 @@ public class LbLinkNetWorkStatisticServiceImpl implements NetWorkStatisticServic
                 String minute5Str = minute5 < 10 ? "0" + minute5 : "" + minute5;
 
                 String timeStr = hhStr + ":" + minute5Str;
+                if (timeStr.compareTo(now) > 0) {
+                    return list2;
+                }
 
 
                 List<String> list = gmap.get(timeStr);
