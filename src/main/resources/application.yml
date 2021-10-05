@@ -3,11 +3,13 @@ spring:
     active: dev
 
 netty:
+  ip: 127.0.0.1
   port: 7000
-  url: 127.0.0.1
 
 server:
   port: 8081
+#  error:
+#    path: /error
   #内嵌tomcat日志
   tomcat:
     accesslog:

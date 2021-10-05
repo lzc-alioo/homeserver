@@ -1,8 +1,7 @@
 package com.alioo.monitor;
 
 import com.alioo.monitor.homeserver.NettyServer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
@@ -11,22 +10,19 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import java.net.InetSocketAddress;
 
+@Slf4j
 @SpringBootApplication
 public class Application implements CommandLineRunner {
 
-    private static final Logger logger = LoggerFactory.getLogger(Application.class);
+    @Value("${netty.ip}")
+    private String ip;
 
     @Value("${netty.port}")
     private int port;
 
-    @Value("${netty.url}")
-    private String url;
-
     @Autowired
-    private NettyServer server;
+    private NettyServer nettyServer;
 
-//    @Autowired
-//    private NetWorkStatisticService flowStatisticService;
 
     public static void main(String[] args) {
         SpringApplication.run(Application.class, args);
@@ -60,9 +56,9 @@ public class Application implements CommandLineRunner {
 
 //        flowStatisticService.getList();
 
-        InetSocketAddress address = new InetSocketAddress(url, port);
-        System.out.println("run  .... . ... " + url+":"+port);
-        server.start(address);
+        InetSocketAddress address = new InetSocketAddress(ip, port);
+        log.info("NettyServer启动成功.... . ... " + ip + ":" + port);
+        nettyServer.start(address);
 
     }
 

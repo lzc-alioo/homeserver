@@ -26,12 +26,12 @@ public class NetWorkStatisticController {
     private NetWorkStatisticService netWorkStatisticService;
 
     public NetWorkStatisticController() {
-        System.out.println("StatisticController...");
+        log.info("StatisticController init...");
     }
 
     @RequestMapping("/getMachineList")
     public LbStatisticDto getMachineList() {
-        System.out.println("statistic/getList...");
+        log.info("statistic/getList...");
 
 
         LbStatisticDto list = netWorkStatisticService.getMachineList();
@@ -43,7 +43,7 @@ public class NetWorkStatisticController {
      */
     @RequestMapping("/setNetWorkSwitch")
     public LbStatisticDto setNetWorkSwitch(AccessCtrlRequest request) {
-        System.out.println("statistic/setNetWorkSwitch...request:" + JsonUtil.toJson(request));
+        log.info("statistic/setNetWorkSwitch...request:" + JsonUtil.toJson(request));
         if (request.getMac() == null) {
             return null;
         }
