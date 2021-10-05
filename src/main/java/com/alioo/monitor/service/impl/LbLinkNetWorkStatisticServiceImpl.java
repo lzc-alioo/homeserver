@@ -5,10 +5,11 @@ import com.alioo.monitor.controller.dto.AccessCtrlRequest;
 import com.alioo.monitor.service.NetWorkStatisticService;
 import com.alioo.monitor.service.component.UnavailableTimeComponent;
 import com.alioo.monitor.service.dto.*;
-import com.alioo.monitor.util.*;
+import com.alioo.monitor.util.DateTimeUtil;
+import com.alioo.monitor.util.FileUtil;
+import com.alioo.monitor.util.HttpUtil;
+import com.alioo.monitor.util.JsonUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -20,8 +21,6 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 public class LbLinkNetWorkStatisticServiceImpl implements NetWorkStatisticService {
-
-    public static Logger NET_LOGGER = LoggerFactory.getLogger("NET");
 
     @Value("${app.monitorpath}")
     private String monitorpath;
@@ -61,9 +60,7 @@ public class LbLinkNetWorkStatisticServiceImpl implements NetWorkStatisticServic
     public LbStatisticDto getMachineList() {
 
         String token = getToken();
-        LbStatisticDto lbStatisticDto = getMachineList(token);
-
-        return lbStatisticDto;
+        return getMachineList(token);
     }
 
 
@@ -102,9 +99,7 @@ public class LbLinkNetWorkStatisticServiceImpl implements NetWorkStatisticServic
             return;
         }
 
-        lbStatisticDto.getTerminals().forEach(terminal -> {
-            terminal.setOrder(AppConfig.orderdMacMap.getOrDefault(terminal.getMac(), 10000));
-        });
+        lbStatisticDto.getTerminals().forEach(terminal -> terminal.setOrder(AppConfig.orderdMacMap.getOrDefault(terminal.getMac(), 10000)));
 
         Collections.sort(lbStatisticDto.getTerminals());
     }
@@ -202,16 +197,6 @@ public class LbLinkNetWorkStatisticServiceImpl implements NetWorkStatisticServic
             LbStatisticDto lbStatisticDto = getMachineList(token);
             List<Terminal> terminals = lbStatisticDto.getTerminals();
 
-//            //新设备加入提醒
-//            terminals.forEach(terminal -> {
-//                if (terminal.getIp() == null || terminal.getIp().isEmpty()) {
-//                    return;
-//                }
-//                if (terminal.getIp() != null && !AppConfig.whiteMacMap.keySet().contains(terminal.getMac())) {
-//                    LogUtil.info(NET_LOGGER, "新设备加入,terminal:{}", JsonUtil.toJson(terminal));
-//                }
-//            });
-
             String realmonitorpath = this.monitorpath + "/" + DateTimeUtil.getDateTimeString("yyyyMMdd") + "/";
 
             FileUtil.mkdirs(realmonitorpath);
@@ -257,13 +242,33 @@ public class LbLinkNetWorkStatisticServiceImpl implements NetWorkStatisticServic
     }
 
 
-    /**
-     * @param datestr     示例：20211002
-     * @param machineName
-     * @return
-     */
-    public List<NetWorkDataDto> getNetWorkData(String datestr, String machineName) {
+    public List<NetWorkDataDto> getNetWorkData(String startTime, String endTime, String machineName) {
 
+        String dateStr = startTime.substring(0, 8);
+
+        List<NetWorkDataDto> list2 = getNetWorkDataByDate(dateStr, machineName);
+
+        String startTimeStr = startTime.substring(8, 10) + ":" + startTime.substring(10, 12);
+        String endTimeStr = endTime.substring(8, 10) + ":" + endTime.substring(10, 12);
+
+        List<NetWorkDataDto> list3 = list2.stream().filter(netWorkDataDto -> {
+            String timeStr = netWorkDataDto.getTimeStr();
+            if (timeStr.compareTo(startTimeStr) < 0) {
+                return false;
+            }
+            if (timeStr.compareTo(endTimeStr) > 0) {
+                return false;
+            }
+
+            return true;
+        }).collect(Collectors.toList());
+
+        return list3;
+
+    }
+
+
+    private List<NetWorkDataDto> getNetWorkDataByDate(String datestr, String machineName) {
         String realmonitorpath = this.monitorpath + "/" + datestr + "/";
 
         String filepath = realmonitorpath + machineName;
@@ -286,13 +291,11 @@ public class LbLinkNetWorkStatisticServiceImpl implements NetWorkStatisticServic
 
         log.info("查询网络数据datestr:{}, machineName:{}, gmap:{}", datestr, machineName, JsonUtil.toJson(gmap));
 
-
         List<NetWorkDataDto> list2 = getNetWorkDataList(gmap);
 
         log.info("查询网络数据处理后 datestr:{}, machineName:{}, gmap2:{}", datestr, machineName, JsonUtil.toJson(list2));
 
         return list2;
-
     }
 
 
@@ -316,8 +319,7 @@ public class LbLinkNetWorkStatisticServiceImpl implements NetWorkStatisticServic
         List<NetWorkDataDto> list2 = new ArrayList<>();
 
         String now = DateTimeUtil.getDateTimeString("HH:mm");
-//        int hhMax = Integer.parseInt(now.substring(0, 2));
-//        int minuteMax = Integer.parseInt(now.substring(2, 4));
+
 
         for (int hh = 0; hh < 24; hh++) {
             String hhStr = hh < 10 ? "0" + hh : "" + hh;
@@ -326,10 +328,6 @@ public class LbLinkNetWorkStatisticServiceImpl implements NetWorkStatisticServic
                 String minute5Str = minute5 < 10 ? "0" + minute5 : "" + minute5;
 
                 String timeStr = hhStr + ":" + minute5Str;
-                if (timeStr.compareTo(now) > 0) {
-                    return list2;
-                }
-
 
                 List<String> list = gmap.get(timeStr);
 
@@ -360,5 +358,18 @@ public class LbLinkNetWorkStatisticServiceImpl implements NetWorkStatisticServic
         return new NetWorkDataDto(timeStr, netSum);
 
     }
+
+    public List<NetWorkDataDto> getOnLineData(String startTime, String endTime, String machineName) {
+
+        List<NetWorkDataDto> list3 = getNetWorkData(startTime, endTime, machineName);
+        list3.forEach(netWorkDataDto -> {
+            if (netWorkDataDto.getNet() > 0) {
+                netWorkDataDto.setNet(1L);
+            }
+        });
+
+        return list3;
+    }
+
 
 }

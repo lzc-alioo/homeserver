@@ -56,11 +56,26 @@ public interface NetWorkStatisticService {
     void monitorNetWork();
 
     /**
-     * 查询指定机器的上网数据
+     * 查询指定机器,指定时间区间的上网数据
      *
-     * @param datestr
+     * @param startTime  示例：202110020000
+     * @param endTime    示例：202110022359
      * @param machineName
      * @return
      */
-    List<NetWorkDataDto> getNetWorkData(String datestr, String machineName);
+    List<NetWorkDataDto> getNetWorkData(String startTime,String endTime , String machineName);
+
+
+    /**
+     * 查询指定机器,指定时间区间的联网数据
+     *
+     * @param startTime  示例：202110020000
+     * @param endTime    示例：202110022359
+     * @param machineName
+     * @return
+     */
+    List<NetWorkDataDto> getOnLineData(String startTime,String endTime , String machineName);
+
+
+
 }

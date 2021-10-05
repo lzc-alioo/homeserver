@@ -59,7 +59,6 @@ public class FileUtil {
         BufferedReader in = null;
         try {
             in = new BufferedReader(new InputStreamReader(new FileInputStream(path)));
-            StringBuffer buffer = new StringBuffer();
             String line = "";
             while ((line = in.readLine()) != null) {
                 list.add(line);

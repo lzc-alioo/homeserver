@@ -6,7 +6,12 @@ import lombok.Data;
 public class NetWorkDataRequest {
 
 
-    String datestr;
+//    String datestr;
+
+    String startTime;
+
+    String endTime;
+
     String machineName;
 
 

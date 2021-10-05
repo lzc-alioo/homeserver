@@ -83,10 +83,16 @@ public class NetWorkStatisticController {
     @RequestMapping("/getNetWorkData")
     public List<NetWorkDataDto> getNetWorkData(NetWorkDataRequest request) {
 
+        String startTime = request.getStartTime();
+        if (StringUtils.isEmpty(startTime)) {
+            startTime = DateTimeUtil.getDateTimeString("yyyyMMdd") + "0000";
+        }
 
-        String datestr = request.getDatestr();
-        if (StringUtils.isEmpty(datestr)) {
-            datestr = DateTimeUtil.getDateTimeString("yyyyMMdd");
+
+        String endTime = request.getEndTime();
+        if (StringUtils.isEmpty(endTime)) {
+
+            endTime = DateTimeUtil.getDateTimeString("yyyyMMdd") + "2359";
         }
 
         String machineName = request.getMachineName();
@@ -94,11 +100,38 @@ public class NetWorkStatisticController {
             machineName = "X3-55";
         }
 
-
-        List<NetWorkDataDto> list = netWorkStatisticService.getNetWorkData(datestr, machineName);
+        List<NetWorkDataDto> list = netWorkStatisticService.getNetWorkData(startTime, endTime, machineName);
 
         return list;
 
     }
+
+
+    @RequestMapping("/getOnLineData")
+    public List<NetWorkDataDto> getOnLineData(NetWorkDataRequest request) {
+
+        String startTime = request.getStartTime();
+        if (StringUtils.isEmpty(startTime)) {
+            startTime = DateTimeUtil.getDateTimeString("yyyyMMdd") + "0000";
+        }
+
+
+        String endTime = request.getEndTime();
+        if (StringUtils.isEmpty(endTime)) {
+
+            endTime = DateTimeUtil.getDateTimeString("yyyyMMdd") + "2359";
+        }
+
+        String machineName = request.getMachineName();
+        if (StringUtils.isEmpty(machineName)) {
+            machineName = "X3-55";
+        }
+
+        List<NetWorkDataDto> list = netWorkStatisticService.getOnLineData(startTime, endTime, machineName);
+
+        return list;
+
+    }
+
 
 }
