@@ -2,7 +2,9 @@ package com.alioo.monitor.service.impl;
 
 import com.alioo.monitor.constant.AppConfig;
 import com.alioo.monitor.controller.dto.AccessCtrlRequest;
+import com.alioo.monitor.controller.dto.NetWorkRequest;
 import com.alioo.monitor.service.NetWorkStatisticService;
+import com.alioo.monitor.service.component.NetWorkComponent;
 import com.alioo.monitor.service.component.UnavailableTimeComponent;
 import com.alioo.monitor.service.dto.*;
 import com.alioo.monitor.util.DateTimeUtil;
@@ -32,11 +34,14 @@ public class LbLinkNetWorkStatisticServiceImpl implements NetWorkStatisticServic
     @Autowired
     private UnavailableTimeComponent unavailableTimeComponent;
 
+    @Autowired
+    private NetWorkComponent netWorkComponent;
+
 
     public String getToken() {
         try {
             String myurl = "http://192.168.16.1/protocol.csp?fname=system&opt=login&function=set&usrid=f11fcbaac530c673a91c6022a49c2219";
-            Map<String, String> headers = getHeaderMap();
+            Map<String, String> headers = netWorkComponent.getHeaderMap();
             Map<String, String> datas = new LinkedHashMap<>();
 
             String ret = HttpUtil.post(myurl, headers, datas);
@@ -69,7 +74,7 @@ public class LbLinkNetWorkStatisticServiceImpl implements NetWorkStatisticServic
         try {
 
             String myurl = "http://192.168.16.1/protocol.csp?token=" + token;
-            Map<String, String> headers = getHeaderMap();
+            Map<String, String> headers = netWorkComponent.getHeaderMap();
 
             Map<String, String> datas = new LinkedHashMap<>();
             datas.put("fname", "system");
@@ -113,7 +118,7 @@ public class LbLinkNetWorkStatisticServiceImpl implements NetWorkStatisticServic
 
 
             String myurl = "http://192.168.16.1/protocol.csp?token=" + token + "&fname=net&opt=host_black&function=set&mac=" + request.getMac() + "&act=" + request.getAct();
-            Map<String, String> headers = getHeaderMap();
+            Map<String, String> headers = netWorkComponent.getHeaderMap();
             Map<String, String> datas = new LinkedHashMap<>();
 
             String ret = HttpUtil.post(myurl, headers, datas);
@@ -229,241 +234,35 @@ public class LbLinkNetWorkStatisticServiceImpl implements NetWorkStatisticServic
 
     }
 
-    private Map<String, String> getHeaderMap() {
-        Map<String, String> headers = new LinkedHashMap<>();
-        headers.put("Connection", "keep-alive");
-        headers.put("Accept", "application/json, text/javascript, */*; q=0.01");
-        headers.put("X-Requested-With", "XMLHttpRequest");
-        headers.put("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.129 Safari/537.36");
-        headers.put("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
-        headers.put("Origin", "http://192.168.16.1");
-        headers.put("Accept-Language", "zh-CN,zh;q=0.9,en;q=0.8");
-
-        return headers;
-    }
 
 
-    public List<NetWorkDataDto> getNetWorkData(String startTime, String endTime, String machineName) {
 
-        String dateStr = startTime.substring(0, 8);
+    public List<NetWorkDetailDto> getNetWorkDetailList(NetWorkRequest request) {
 
-        List<NetWorkDataDto> list2 = getNetWorkDataByDate(dateStr, machineName);
+        String dateStr = request.getStartTime().substring(0, 8);
 
-        String startTimeStr = startTime.substring(8, 10) + ":" + startTime.substring(10, 12);
-        String endTimeStr = endTime.substring(8, 10) + ":" + endTime.substring(10, 12);
+        Map<String, List<String>> groupMap = netWorkComponent.getNetWorkGroup(dateStr, request.getMachineName());
 
-        List<NetWorkDataDto> list3 = list2.stream().filter(netWorkDataDto -> {
-            String timeStr = netWorkDataDto.getTimeStr();
-            if (timeStr.compareTo(startTimeStr) < 0) {
-                return false;
-            }
-            if (timeStr.compareTo(endTimeStr) > 0) {
-                return false;
-            }
+        List<NetWorkDetailDto> list2 = netWorkComponent.getNetWorkDetailList(groupMap);
 
-            return true;
-        }).collect(Collectors.toList());
+        List<NetWorkDetailDto> list3 = netWorkComponent.getSubList(request, list2);
 
         return list3;
 
     }
 
 
-    private List<NetWorkDataDto> getNetWorkDataByDate(String datestr, String machineName) {
-        String realmonitorpath = this.monitorpath + "/" + datestr + "/";
+    public List<NetWorkOnLineDto> getNewWorkOnLineList(NetWorkRequest request) {
 
-        String filepath = realmonitorpath + machineName;
+        String dateStr = request.getStartTime().substring(0, 8);
 
-        File file = new File(filepath);
-        if (!file.exists()) {
-            return new ArrayList<>();
-        }
+        Map<String, List<String>> groupMap = netWorkComponent.getNetWorkGroup(dateStr, request.getMachineName());
 
+        List<NetWorkOnLineDto> list2 = netWorkComponent.getNewWorkOnLineList(groupMap);
 
-        List<String> list = FileUtil.readFile2List(filepath);
-
-        Map<String, List<String>> gmap = list.stream().collect(
-                Collectors.groupingBy(
-                        str -> getTime5Str(str),
-                        LinkedHashMap::new,
-                        Collectors.toList()
-                )
-        );
-
-        log.info("查询网络数据datestr:{}, machineName:{}, gmap:{}", datestr, machineName, JsonUtil.toJson(gmap));
-
-        List<NetWorkDataDto> list2 = getNetWorkDataList(gmap);
-
-        log.info("查询网络数据处理后 datestr:{}, machineName:{}, gmap2:{}", datestr, machineName, JsonUtil.toJson(list2));
-
-        return list2;
-    }
-
-
-    private String getTime5Str(String str) {
-        String time = str.split(",")[0];
-
-        String[] hhMM = time.split(":");
-
-        int minute = Integer.parseInt(hhMM[1]);
-
-        //先除5 后乘以5 的目的是为去了小数
-        int minute5 = minute / 5 * 5;
-
-        String minute5Str = minute5 < 10 ? "0" + minute5 : "" + minute5;
-
-        return hhMM[0] + ":" + minute5Str;
-
-    }
-
-    private List<NetWorkDataDto> getNetWorkDataList(Map<String, List<String>> gmap) {
-        List<NetWorkDataDto> list2 = new ArrayList<>();
-
-        String now = DateTimeUtil.getDateTimeString("HH:mm");
-
-
-        for (int hh = 0; hh < 24; hh++) {
-            String hhStr = hh < 10 ? "0" + hh : "" + hh;
-
-            for (int minute5 = 0; minute5 < 60; minute5 = minute5 + 5) {
-                String minute5Str = minute5 < 10 ? "0" + minute5 : "" + minute5;
-
-                String timeStr = hhStr + ":" + minute5Str;
-
-                List<String> list = gmap.get(timeStr);
-
-                NetWorkDataDto netWorkDataDto = getNetWorkDataDto(timeStr, list);
-                list2.add(netWorkDataDto);
-
-            }
-
-        }
-
-
-        return list2;
-    }
-
-
-    private NetWorkDataDto getNetWorkDataDto(String timeStr, List<String> list) {
-        if (list == null || list.isEmpty()) {
-            return new NetWorkDataDto(timeStr, 0);
-        }
-
-        Long netSum = list.stream().map(str -> {
-            String arr[] = str.split(",");
-            long net = Long.parseLong(arr[3]) + Long.parseLong(arr[4]);
-            return net;
-
-        }).reduce(Long::sum).get();
-
-        return new NetWorkDataDto(timeStr, netSum);
-
-    }
-
-    public List<OnLineDataDto> getOnLineData(String startTime, String endTime, String machineName) {
-
-        String dateStr = startTime.substring(0, 8);
-
-        List<OnLineDataDto> list2 = getOnLineDataByDate(dateStr, machineName);
-
-        String startTimeStr = startTime.substring(8, 10) + ":" + startTime.substring(10, 12);
-        String endTimeStr = endTime.substring(8, 10) + ":" + endTime.substring(10, 12);
-
-        List<OnLineDataDto> list3 = list2.stream().filter(lineDataDto -> {
-            String timeStr = lineDataDto.getTimeStr();
-            if (timeStr.compareTo(startTimeStr) < 0) {
-                return false;
-            }
-            if (timeStr.compareTo(endTimeStr) > 0) {
-                return false;
-            }
-
-            return true;
-        }).collect(Collectors.toList());
-
-
-
-
+        List<NetWorkOnLineDto> list3 = netWorkComponent.getSubList(request, list2);
 
         return list3;
-    }
-
-
-    private List<OnLineDataDto> getOnLineDataByDate(String datestr, String machineName) {
-        String realmonitorpath = this.monitorpath + "/" + datestr + "/";
-
-        String filepath = realmonitorpath + machineName;
-
-        File file = new File(filepath);
-        if (!file.exists()) {
-            return new ArrayList<>();
-        }
-
-
-        List<String> list = FileUtil.readFile2List(filepath);
-
-        Map<String, List<String>> gmap = list.stream().collect(
-                Collectors.groupingBy(
-                        str -> getTime5Str(str),
-                        LinkedHashMap::new,
-                        Collectors.toList()
-                )
-        );
-
-        log.info("查询网络数据datestr:{}, machineName:{}, gmap:{}", datestr, machineName, JsonUtil.toJson(gmap));
-
-        List<OnLineDataDto> list2 = getOnLineDataList(gmap);
-
-        log.info("查询网络数据处理后 datestr:{}, machineName:{}, gmap2:{}", datestr, machineName, JsonUtil.toJson(list2));
-
-        return list2;
-    }
-
-    private List<OnLineDataDto> getOnLineDataList(Map<String, List<String>> gmap) {
-        List<OnLineDataDto> list2 = new ArrayList<>();
-
-        String now = DateTimeUtil.getDateTimeString("HH:mm");
-
-
-        for (int hh = 0; hh < 24; hh++) {
-            String hhStr = hh < 10 ? "0" + hh : "" + hh;
-
-            for (int minute5 = 0; minute5 < 60; minute5 = minute5 + 5) {
-                String minute5Str = minute5 < 10 ? "0" + minute5 : "" + minute5;
-
-                String timeStr = hhStr + ":" + minute5Str;
-
-                List<String> list = gmap.get(timeStr);
-
-                OnLineDataDto netWorkDataDto = getOnLineDataDto(timeStr, list);
-                list2.add(netWorkDataDto);
-
-            }
-
-        }
-
-
-        return list2;
-    }
-
-
-    private OnLineDataDto getOnLineDataDto(String timeStr, List<String> list) {
-        if (list == null || list.isEmpty()) {
-            return new OnLineDataDto(timeStr, 0);
-        }
-
-        Long netSum = list.stream().map(str -> {
-            String arr[] = str.split(",");
-            if(arr[2]==null || arr[2].isEmpty()){
-                return 0L;
-            }
-
-            return 1L;
-
-        }).reduce(Long::sum).get();
-
-        return new OnLineDataDto(timeStr, netSum);
-
     }
 
 

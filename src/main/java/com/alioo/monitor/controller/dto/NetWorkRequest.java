@@ -3,7 +3,7 @@ package com.alioo.monitor.controller.dto;
 import lombok.Data;
 
 @Data
-public class NetWorkDataRequest {
+public class NetWorkRequest {
 
 
 //    String datestr;

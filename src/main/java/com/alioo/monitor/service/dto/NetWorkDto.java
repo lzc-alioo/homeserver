@@ -9,7 +9,8 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class NetWorkDataDto {
+public class NetWorkDto {
     private String timeStr;
     private long net;
+
 }

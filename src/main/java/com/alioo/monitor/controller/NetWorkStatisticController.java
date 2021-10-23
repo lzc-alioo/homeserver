@@ -1,11 +1,11 @@
 package com.alioo.monitor.controller;
 
 import com.alioo.monitor.controller.dto.AccessCtrlRequest;
+import com.alioo.monitor.controller.dto.NetWorkRequest;
 import com.alioo.monitor.service.NetWorkStatisticService;
-import com.alioo.monitor.controller.dto.NetWorkDataRequest;
 import com.alioo.monitor.service.dto.LbStatisticDto;
-import com.alioo.monitor.service.dto.NetWorkDataDto;
-import com.alioo.monitor.service.dto.OnLineDataDto;
+import com.alioo.monitor.service.dto.NetWorkDetailDto;
+import com.alioo.monitor.service.dto.NetWorkOnLineDto;
 import com.alioo.monitor.service.dto.UnavailableTimeDto;
 import com.alioo.monitor.util.DateTimeUtil;
 import com.alioo.monitor.util.JsonUtil;
@@ -82,53 +82,37 @@ public class NetWorkStatisticController {
 
 
     @RequestMapping("/getNetWorkData")
-    public List<NetWorkDataDto> getNetWorkData(NetWorkDataRequest request) {
+    public List<NetWorkDetailDto> getNetWorkData(NetWorkRequest request) {
 
-        String startTime = request.getStartTime();
-        if (StringUtils.isEmpty(startTime)) {
-            startTime = DateTimeUtil.getDateTimeString("yyyyMMdd") + "0000";
-        }
+        checkParams(request);
 
-
-        String endTime = request.getEndTime();
-        if (StringUtils.isEmpty(endTime)) {
-
-            endTime = DateTimeUtil.getDateTimeString("yyyyMMdd") + "2359";
-        }
-
-        String machineName = request.getMachineName();
-        if (StringUtils.isEmpty(machineName)) {
-            machineName = "X3-55";
-        }
-
-        List<NetWorkDataDto> list = netWorkStatisticService.getNetWorkData(startTime, endTime, machineName);
+        List<NetWorkDetailDto> list = netWorkStatisticService.getNetWorkDetailList(request);
 
         return list;
+    }
 
+    private void checkParams(NetWorkRequest request) {
+        String startTime = request.getStartTime();
+        if (StringUtils.isEmpty(startTime)) {
+            request.setStartTime(DateTimeUtil.getDateTimeString("yyyyMMdd") + "0000");
+        }
+        String endTime = request.getEndTime();
+        if (StringUtils.isEmpty(endTime)) {
+            request.setEndTime(DateTimeUtil.getDateTimeString("yyyyMMdd") + "2359");
+        }
+        String machineName = request.getMachineName();
+        if (StringUtils.isEmpty(machineName)) {
+            request.setMachineName("X3-55");
+        }
     }
 
 
     @RequestMapping("/getOnLineData")
-    public List<OnLineDataDto> getOnLineData(NetWorkDataRequest request) {
+    public List<NetWorkOnLineDto> getOnLineData(NetWorkRequest request) {
 
-        String startTime = request.getStartTime();
-        if (StringUtils.isEmpty(startTime)) {
-            startTime = DateTimeUtil.getDateTimeString("yyyyMMdd") + "0000";
-        }
+        checkParams(request);
 
-
-        String endTime = request.getEndTime();
-        if (StringUtils.isEmpty(endTime)) {
-
-            endTime = DateTimeUtil.getDateTimeString("yyyyMMdd") + "2359";
-        }
-
-        String machineName = request.getMachineName();
-        if (StringUtils.isEmpty(machineName)) {
-            machineName = "X3-55";
-        }
-
-        List<OnLineDataDto> list = netWorkStatisticService.getOnLineData(startTime, endTime, machineName);
+        List<NetWorkOnLineDto> list = netWorkStatisticService.getNewWorkOnLineList(request);
 
         return list;
 

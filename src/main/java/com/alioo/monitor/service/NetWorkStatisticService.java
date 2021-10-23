@@ -1,9 +1,10 @@
 package com.alioo.monitor.service;
 
 import com.alioo.monitor.controller.dto.AccessCtrlRequest;
+import com.alioo.monitor.controller.dto.NetWorkRequest;
 import com.alioo.monitor.service.dto.LbStatisticDto;
-import com.alioo.monitor.service.dto.NetWorkDataDto;
-import com.alioo.monitor.service.dto.OnLineDataDto;
+import com.alioo.monitor.service.dto.NetWorkDetailDto;
+import com.alioo.monitor.service.dto.NetWorkOnLineDto;
 import com.alioo.monitor.service.dto.UnavailableTimeDto;
 
 import java.util.List;
@@ -59,24 +60,19 @@ public interface NetWorkStatisticService {
     /**
      * 查询指定机器,指定时间区间的上网数据
      *
-     * @param startTime  示例：202110020000
-     * @param endTime    示例：202110022359
-     * @param machineName
+     * @param request startTime  示例：202110020000 ;endTime    示例：202110022359
      * @return
      */
-    List<NetWorkDataDto> getNetWorkData(String startTime,String endTime , String machineName);
+    List<NetWorkDetailDto> getNetWorkDetailList(NetWorkRequest request);
 
 
     /**
      * 查询指定机器,指定时间区间的联网数据
      *
-     * @param startTime  示例：202110020000
-     * @param endTime    示例：202110022359
-     * @param machineName
+     * @param request startTime  示例：202110020000 ;endTime    示例：202110022359
      * @return
      */
-    List<OnLineDataDto> getOnLineData(String startTime, String endTime , String machineName);
-
+    List<NetWorkOnLineDto> getNewWorkOnLineList(NetWorkRequest request);
 
 
 }
