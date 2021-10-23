@@ -1,13 +1,11 @@
 #!/usr/bin/env bash
 # /home/pi/work/build/start.sh add to /etc/rc.local
 
-sleep 5
-
 PATH_BASE=`dirname $0`
-RUN_JAR=homeserver-0.0.1-SNAPSHOT.jar
+RUN_APP=homeserver-0.0.1-SNAPSHOT.jar
 LOG_FILE=logs/`date +%Y%m%d%H%M%S`.log
 
-echo "$(date "+%Y-%m-%d %H:%M:%S") $RUN_JAR start... you can see log:$LOG_FILE"
+echo "$(date "+%Y-%m-%d %H:%M:%S") $RUN_APP start... you can see log:$LOG_FILE"
 
 cd $PATH_BASE
 sudo chown -R pi:pi $PATH_BASE/*
@@ -35,4 +33,4 @@ do
     fi
 done
 
-echo "$(date "+%Y-%m-%d %H:%M:%S") $RUN_JAR started success."
+echo "$(date "+%Y-%m-%d %H:%M:%S") $RUN_APP started success."

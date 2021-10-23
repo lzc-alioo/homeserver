@@ -5,6 +5,7 @@ import com.alioo.monitor.service.NetWorkStatisticService;
 import com.alioo.monitor.controller.dto.NetWorkDataRequest;
 import com.alioo.monitor.service.dto.LbStatisticDto;
 import com.alioo.monitor.service.dto.NetWorkDataDto;
+import com.alioo.monitor.service.dto.OnLineDataDto;
 import com.alioo.monitor.service.dto.UnavailableTimeDto;
 import com.alioo.monitor.util.DateTimeUtil;
 import com.alioo.monitor.util.JsonUtil;
@@ -108,7 +109,7 @@ public class NetWorkStatisticController {
 
 
     @RequestMapping("/getOnLineData")
-    public List<NetWorkDataDto> getOnLineData(NetWorkDataRequest request) {
+    public List<OnLineDataDto> getOnLineData(NetWorkDataRequest request) {
 
         String startTime = request.getStartTime();
         if (StringUtils.isEmpty(startTime)) {
@@ -127,7 +128,7 @@ public class NetWorkStatisticController {
             machineName = "X3-55";
         }
 
-        List<NetWorkDataDto> list = netWorkStatisticService.getOnLineData(startTime, endTime, machineName);
+        List<OnLineDataDto> list = netWorkStatisticService.getOnLineData(startTime, endTime, machineName);
 
         return list;
 

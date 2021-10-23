@@ -13,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ObjectUtils;
 
 import java.io.File;
 import java.util.*;
@@ -204,7 +205,7 @@ public class LbLinkNetWorkStatisticServiceImpl implements NetWorkStatisticServic
             //流量监控
             terminals.stream()
                     .filter(terminal -> {
-                        return true;
+                        return ObjectUtils.isEmpty(terminal);
                     })
                     .forEach(terminal -> {
                         //format data
@@ -359,16 +360,110 @@ public class LbLinkNetWorkStatisticServiceImpl implements NetWorkStatisticServic
 
     }
 
-    public List<NetWorkDataDto> getOnLineData(String startTime, String endTime, String machineName) {
+    public List<OnLineDataDto> getOnLineData(String startTime, String endTime, String machineName) {
 
-        List<NetWorkDataDto> list3 = getNetWorkData(startTime, endTime, machineName);
-        list3.forEach(netWorkDataDto -> {
-            if (netWorkDataDto.getNet() > 0) {
-                netWorkDataDto.setNet(1L);
+        String dateStr = startTime.substring(0, 8);
+
+        List<OnLineDataDto> list2 = getOnLineDataByDate(dateStr, machineName);
+
+        String startTimeStr = startTime.substring(8, 10) + ":" + startTime.substring(10, 12);
+        String endTimeStr = endTime.substring(8, 10) + ":" + endTime.substring(10, 12);
+
+        List<OnLineDataDto> list3 = list2.stream().filter(lineDataDto -> {
+            String timeStr = lineDataDto.getTimeStr();
+            if (timeStr.compareTo(startTimeStr) < 0) {
+                return false;
             }
-        });
+            if (timeStr.compareTo(endTimeStr) > 0) {
+                return false;
+            }
+
+            return true;
+        }).collect(Collectors.toList());
+
+
+
+
 
         return list3;
+    }
+
+
+    private List<OnLineDataDto> getOnLineDataByDate(String datestr, String machineName) {
+        String realmonitorpath = this.monitorpath + "/" + datestr + "/";
+
+        String filepath = realmonitorpath + machineName;
+
+        File file = new File(filepath);
+        if (!file.exists()) {
+            return new ArrayList<>();
+        }
+
+
+        List<String> list = FileUtil.readFile2List(filepath);
+
+        Map<String, List<String>> gmap = list.stream().collect(
+                Collectors.groupingBy(
+                        str -> getTime5Str(str),
+                        LinkedHashMap::new,
+                        Collectors.toList()
+                )
+        );
+
+        log.info("查询网络数据datestr:{}, machineName:{}, gmap:{}", datestr, machineName, JsonUtil.toJson(gmap));
+
+        List<OnLineDataDto> list2 = getOnLineDataList(gmap);
+
+        log.info("查询网络数据处理后 datestr:{}, machineName:{}, gmap2:{}", datestr, machineName, JsonUtil.toJson(list2));
+
+        return list2;
+    }
+
+    private List<OnLineDataDto> getOnLineDataList(Map<String, List<String>> gmap) {
+        List<OnLineDataDto> list2 = new ArrayList<>();
+
+        String now = DateTimeUtil.getDateTimeString("HH:mm");
+
+
+        for (int hh = 0; hh < 24; hh++) {
+            String hhStr = hh < 10 ? "0" + hh : "" + hh;
+
+            for (int minute5 = 0; minute5 < 60; minute5 = minute5 + 5) {
+                String minute5Str = minute5 < 10 ? "0" + minute5 : "" + minute5;
+
+                String timeStr = hhStr + ":" + minute5Str;
+
+                List<String> list = gmap.get(timeStr);
+
+                OnLineDataDto netWorkDataDto = getOnLineDataDto(timeStr, list);
+                list2.add(netWorkDataDto);
+
+            }
+
+        }
+
+
+        return list2;
+    }
+
+
+    private OnLineDataDto getOnLineDataDto(String timeStr, List<String> list) {
+        if (list == null || list.isEmpty()) {
+            return new OnLineDataDto(timeStr, 0);
+        }
+
+        Long netSum = list.stream().map(str -> {
+            String arr[] = str.split(",");
+            if(arr[2]==null || arr[2].isEmpty()){
+                return 0L;
+            }
+
+            return 1L;
+
+        }).reduce(Long::sum).get();
+
+        return new OnLineDataDto(timeStr, netSum);
+
     }
 
 

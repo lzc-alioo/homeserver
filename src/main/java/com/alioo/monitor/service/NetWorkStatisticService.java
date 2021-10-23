@@ -3,6 +3,7 @@ package com.alioo.monitor.service;
 import com.alioo.monitor.controller.dto.AccessCtrlRequest;
 import com.alioo.monitor.service.dto.LbStatisticDto;
 import com.alioo.monitor.service.dto.NetWorkDataDto;
+import com.alioo.monitor.service.dto.OnLineDataDto;
 import com.alioo.monitor.service.dto.UnavailableTimeDto;
 
 import java.util.List;
@@ -74,7 +75,7 @@ public interface NetWorkStatisticService {
      * @param machineName
      * @return
      */
-    List<NetWorkDataDto> getOnLineData(String startTime,String endTime , String machineName);
+    List<OnLineDataDto> getOnLineData(String startTime, String endTime , String machineName);
 
 
 
