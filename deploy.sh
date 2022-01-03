@@ -10,4 +10,6 @@ scp -c chacha20-poly1305@openssh.com  -o "Compression yes" build/* pi@raspberryp
 
 ssh pi@raspberrypi "chown pi:pi /home/pi/work/build/"
 ssh pi@raspberrypi "chmod +x /home/pi/work/build/*.sh"
+ssh pi@raspberrypi "mv /home/pi/work/build/cpolarstart.sh /home/pi/work/cpolar/"
+
 ssh pi@raspberrypi "/home/pi/work/build/restart.sh"
