@@ -210,7 +210,7 @@ public class LbLinkNetWorkStatisticServiceImpl implements NetWorkStatisticServic
             //流量监控
             terminals.stream()
                     .filter(terminal -> {
-                        return ObjectUtils.isEmpty(terminal);
+                        return !ObjectUtils.isEmpty(terminal);
                     })
                     .forEach(terminal -> {
                         //format data
