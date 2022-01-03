@@ -52,7 +52,7 @@ def loop():
 def executeCmd(command):
     if command == 'KEY_CHANNEL':
         print 't_up'
-        t_up(20,0.5)
+        # t_up(20,0.5)
     if command == 'KEY_NEXT':
         print 't_stop'
         # t_stop(0.5)

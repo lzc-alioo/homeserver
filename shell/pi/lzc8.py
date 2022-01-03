@@ -4,8 +4,11 @@
 #摇控器实验 加入声音：提示摇控器输入已接收
 #摇控器实验 声音GPIO.setmode(GPIO.BOARD)改成GPIO.setmode(GPIO.BCM)
 #摇控器实验 加入运动指令,每次运行3秒结束，等待下一次指令
+#摇控器实验 除了前进后退方向键利用起来外，将其它的按键也利用起来，比如让超声波避障
 
 
+
+import os
 import pylirc, time
 import RPi.GPIO as GPIO
 
@@ -49,6 +52,11 @@ def getCommand(code):
     return code[0]["config"]
 
 
+
+def sound(soundValue):
+    soundStart(soundValue)
+    soundStop()
+
 def soundStart(soundValue):
     Buzz.start(50)
     Buzz.ChangeFrequency(soundValue)
@@ -59,8 +67,8 @@ def soundStop():
     Buzz.stop()                 # Stop the buzzer
 
 def destroy():
-    GPIO.cleanup()
-    pylirc.exit()
+	GPIO.cleanup()
+	pylirc.exit()
 
 def loop():
     print("阻塞模式，等待摇控器信号输入")
@@ -69,33 +77,46 @@ def loop():
         command=getCommand(code)
         print 'code: ' , code, "////command:" , command
 
-        soundStart(131)
-        soundStop()
-
         executeCmd(command)
 
 
 def executeCmd(command):
     if command == 'KEY_CHANNEL':
         print 't_up'
-        t_up(20,3)
+        sound(131)
+        t_up(30,3)
         t_stop(0)
-    if command == 'KEY_NEXT':
-        print 't_stop'
-        t_stop(0)
-    if command == 'KEY_PREVIOUS':
-        print 't_left'
-        t_left(20,3)
-        t_stop(0)
-    if command == 'KEY_PLAYPAUSE':
-        print 't_right'
-        t_right(20,3)
-        t_stop(0)
+        return
     if command == 'KEY_VOLUMEUP':
         print 't_down'
-        t_down(20,3)
+        sound(196)
+        t_down(30,3)
         t_stop(0)
+        return
+    if command == 'KEY_PREVIOUS':
+        print 't_left'
+        sound(165)
+        t_left(20,3)
+        t_stop(0)
+        return
+    if command == 'KEY_PLAYPAUSE':
+        print 't_right'
+        sound(175)
+        t_right(20,3)
+        t_stop(0)
+        return
+    if command == 'KEY_NEXT':
+        print 't_stop'
+        sound(147)
+        t_stop(0)
+        return
+    if command == 'KEY_NUMERIC_8':
+        print '进入超声波避障程序'
+        sound(200)
+        os.system('python /home/pi/ZYRobot/ultrasonic_Servo/MotorHAT/ultrasonic_lzc.py')
+        return
 
+    sound(248)
 
 
 def t_up(speed,t_time):
@@ -157,12 +178,14 @@ if __name__ == '__main__':
     R_Motor = GPIO.PWM(PWMB,100)
     R_Motor.start(0)
 
-    # pylirc.init("pylirc", "/home/pi/ZYRobot/ircontrol/conf", blocking)
-    pylirc.init("pylirc", "./conf", blocking)
-
+    pylirc.init("pylirc", "/home/pi/ZYRobot/ircontrol/conf", blocking)
+    #pylirc.init("pylirc", "./conf", blocking)
+    
     try:
         loop()
     except KeyboardInterrupt:
         destroy()
+
+
 
 

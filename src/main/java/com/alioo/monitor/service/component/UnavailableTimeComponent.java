@@ -27,6 +27,10 @@ public class UnavailableTimeComponent {
             return list;
         }
 
+//        time.txt example
+//        09:00,09:10
+//        20:00,20:10
+//        21:00,23:59
         List<String> tmplist = FileUtil.readFile2List(timepath);
         log.info("readfile timepath:" + timepath, "tmplist=" + tmplist);
 

@@ -1,4 +1,7 @@
 
+
+ssh pi@raspberrypi "mkdir -p /home/pi/work/build/"
+
 #提前配置ssh-key
 #scp -c aes128-ctr  build/* pi@raspberrypi:/home/pi/work/build/
 scp -c chacha20-poly1305@openssh.com  -o "Compression yes" build/* pi@raspberrypi:/home/pi/work/build/

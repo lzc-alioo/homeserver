@@ -128,3 +128,12 @@ sudo iptables -A FORWARD -i wlan1 -o wlan0 -m state --state RELATED,ESTABLISHED 
 sudo iptables -A FORWARD -i wlan0 -o wlan1 -j ACCEPT
 
 
+
+
+dc:a6:32:23:35:d4
+3c:46:d8:9f:7c:a4
+
+
+DC:A6:32:23:35:D4
+3C:46:D8:9F:7C:A4
+
