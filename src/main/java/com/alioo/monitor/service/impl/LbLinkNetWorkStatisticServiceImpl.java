@@ -197,7 +197,7 @@ public class LbLinkNetWorkStatisticServiceImpl implements NetWorkStatisticServic
         try {
             String now = DateTimeUtil.getDateTimeString("HH:mm");
 
-            log.info("scheduled checkNetWork now:{}", now);
+            log.info("scheduled monitorNetWork now:{}", now);
 
             String token = getToken();
             LbStatisticDto lbStatisticDto = getMachineList(token);
