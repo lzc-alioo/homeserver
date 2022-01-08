@@ -16,6 +16,7 @@ public class AppConfig {
         whiteMacMap.put("78:0F:77:62:47:E0","kaiguan01");
         whiteMacMap.put("38:F9:D3:2E:B6:DF","ali15");
         whiteMacMap.put("70:48:0F:52:ED:C1","ali6s");
+        whiteMacMap.put("BC:FF:4D:20:11:C2","mindor");
 //        whiteMacMap.put("B8:FC:9A:3E:6A:DC","X3-55");
 //        whiteMacMap.put("00:F7:6F:9A:4A:A1","ali5s");
 //        whiteMacMap.put("E4:A3:2F:2D:29:00","W910");
@@ -36,6 +37,7 @@ public class AppConfig {
         orderdMacMap.put("C2:31:3A:DD:51:35",idx++); //hlnew50
         orderdMacMap.put("38:F9:D3:2E:B6:DF",idx++); //alioo15
         orderdMacMap.put("A4:83:E7:3C:3F:3D",idx++); //E097815-BJ
+        orderdMacMap.put("BC:FF:4D:20:11:C2",idx++); //E097815-BJ
 
     }
 
