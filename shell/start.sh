@@ -13,8 +13,10 @@ cd $PATH_BASE
 sudo chown -R pi:pi $PATH_BASE/*
 
 #java -jar $PATH_BASE/homeserver-0.0.1-SNAPSHOT.jar &
-cmd="java -jar $PATH_BASE/homeserver-0.0.1-SNAPSHOT.jar --spring.profiles.active=prod"
-nohup $cmd >> $LOG_FILE 2>&1  &
+cmd="java -jar $PATH_BASE/$RUN_APP --spring.profiles.active=prod"
+#nohup $cmd >> $LOG_FILE 2>&1  &
+su - pi  -s /bin/bash -c "nohup $cmd >> $LOG_FILE 2>&1   &"
+
 
 # 查询日志检测java程序是否启动成功
 echo "$(date "+%Y-%m-%d %H:%M:%S") checking if started ..."
