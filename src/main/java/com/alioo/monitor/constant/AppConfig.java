@@ -10,6 +10,7 @@ public class AppConfig {
 
     static {
         whiteMacMap.put("80:0C:67:1F:69:F7","ali11");
+        whiteMacMap.put("26:47:ED:93:9E:38","ali11"); //ali11私有地址
         whiteMacMap.put("DC:A6:32:23:35:D4","raspberrypi");
 //        whiteMacMap.put("48:3C:0C:74:9B:F0","hl");
         whiteMacMap.put("A4:83:E7:3C:3F:3D","ali13");
