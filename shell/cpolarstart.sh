@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # /home/pi/work/cpolar/cpolarstart.sh add to /etc/rc.local
+# su - pi  -s /bin/bash /home/pi/work/cpolar/cpolarstart.sh add to /etc/rc.local
 
 PATH_BASE=$(cd $(dirname $0); pwd)
 RUN_APP=cpolar
@@ -12,4 +13,5 @@ cd $PATH_BASE
 #sudo chown -R pi:pi $PATH_BASE/*
 
 cmd="$PATH_BASE/cpolar http 8081 -log=stdout"
-nohup $cmd >> $LOG_FILE 2>&1   &
+#nohup $cmd >> $LOG_FILE 2>&1  &
+su - pi  -s /bin/bash -c "nohup $cmd >> $LOG_FILE 2>&1   &"
