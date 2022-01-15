@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # /home/pi/work/build/start.sh add to /etc/rc.local
 
-PATH_BASE=`dirname $0`
+PATH_BASE=$(cd $(dirname $0); pwd)
 RUN_APP=homeserver-0.0.1-SNAPSHOT.jar
 LOG_PATH=$PATH_BASE/logs
 LOG_FILE=$LOG_PATH/`date +%Y%m%d%H%M%S`.log
@@ -15,7 +15,7 @@ sudo chown -R pi:pi $PATH_BASE/*
 #java -jar $PATH_BASE/homeserver-0.0.1-SNAPSHOT.jar &
 cmd="java -jar $PATH_BASE/$RUN_APP --spring.profiles.active=prod"
 #nohup $cmd >> $LOG_FILE 2>&1  &
-su - pi  -s /bin/bash -c "nohup $cmd >> $LOG_FILE 2>&1   &"
+sudo su - pi  -s /bin/bash -c "nohup $cmd >> $LOG_FILE 2>&1   &"
 
 
 # 查询日志检测java程序是否启动成功

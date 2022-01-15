@@ -14,4 +14,4 @@ cd $PATH_BASE
 
 cmd="$PATH_BASE/cpolar http 8081 -log=stdout"
 #nohup $cmd >> $LOG_FILE 2>&1  &
-su - pi  -s /bin/bash -c "nohup $cmd >> $LOG_FILE 2>&1   &"
+sudo su - pi  -s /bin/bash -c "nohup $cmd >> $LOG_FILE 2>&1   &"
