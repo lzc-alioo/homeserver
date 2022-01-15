@@ -9,7 +9,7 @@ RUN_APP=cpolar
 
 echo "$(date "+%Y-%m-%d %H:%M:%S") === app:$RUN_APP event:stop === 开始执行cpolarstop.sh..."
 
-pid=$(ps aux | grep $RUN_APP | grep -v grep | grep -v cpolarstop  | grep -v cpolarrestart.sh | awk -F ' ' '{print $2}')
+pid=$(ps aux | grep "cpolar: master" | grep -v grep | grep -v cpolarstop  | grep -v cpolarrestart.sh | awk -F ' ' '{print $2}')
 
 if [ "" != "$pid" ]; then
     sudo kill -9 $pid
