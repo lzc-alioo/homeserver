@@ -16,6 +16,7 @@ echo "$(date "+%Y-%m-%d %H:%M:%S") === app:$RUN_APP event:start === you can see 
 cd $PATH_BASE
 #sudo chown -R pi:pi $PATH_BASE/*
 
-cmd="$PATH_BASE/cpolar http 8081 -log=stdout"
+#cmd="$PATH_BASE/cpolar http 8081 -log=stdout"
+cmd="$PATH_BASE/cpolar start-all -log=stdout"
 #nohup $cmd >> $LOG_FILE 2>&1  &
 sudo su - pi  -s /bin/bash -c "nohup $cmd >> $LOG_FILE 2>&1   &"

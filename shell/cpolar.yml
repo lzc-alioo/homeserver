@@ -1,0 +1,10 @@
+authtoken: NzVkMDFhN2ItNmI2OC00ZmFkLWFkMTMtYmIwYzMwZmQwNzIw
+tunnels:
+  ssh:
+    proto: tcp
+    addr: "22"
+    region: cn_vip
+  homeserver:
+    proto: http
+    addr: "8081"
+    region: cn_vip
