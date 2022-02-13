@@ -2,10 +2,7 @@ package com.alioo.monitor.service;
 
 import com.alioo.monitor.controller.dto.AccessCtrlRequest;
 import com.alioo.monitor.controller.dto.NetWorkRequest;
-import com.alioo.monitor.service.dto.LbStatisticDto;
-import com.alioo.monitor.service.dto.NetWorkDetailDto;
-import com.alioo.monitor.service.dto.NetWorkOnLineDto;
-import com.alioo.monitor.service.dto.UnavailableTimeDto;
+import com.alioo.monitor.service.dto.*;
 
 import java.util.List;
 
@@ -24,6 +21,13 @@ public interface NetWorkStatisticService {
      * @return
      */
     LbStatisticDto getMachineList();
+
+    /**
+     * 获得登录到路由器的机器列表
+     *
+     * @return
+     */
+    public List<Terminal2> getMachineList2();
 
     /**
      * 控制单台机器的上网行为

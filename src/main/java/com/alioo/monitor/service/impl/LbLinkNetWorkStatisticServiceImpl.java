@@ -69,6 +69,29 @@ public class LbLinkNetWorkStatisticServiceImpl implements NetWorkStatisticServic
         return getMachineList(token);
     }
 
+    public List<Terminal2> getMachineList2() {
+
+        LbStatisticDto lbStatisticDto = getMachineList();
+
+        List<Terminal2> list = lbStatisticDto.getTerminals().stream()
+                .map(terminal -> {
+                    Terminal2 terminal2 = new Terminal2();
+                    terminal2.setName(terminal.getName());
+                    terminal2.setIp(terminal.getIp());
+                    terminal2.setMac(terminal.getMac());
+
+                    terminal2.setDownSpeed(terminal.getSpeed());
+                    terminal2.setUpSpeed(terminal.getUpSpeed());
+
+                    terminal2.setChecked(("F".equals(terminal.getFlag().substring(2, 3))) ? true : false);
+                    terminal2.setState(ObjectUtils.isEmpty(terminal.getIp()) ? "off_online" : "on_line");
+
+                    return terminal2;
+                })
+                .collect(Collectors.toList());
+
+        return list;
+    }
 
     private LbStatisticDto getMachineList(String token) {
         try {
@@ -233,8 +256,6 @@ public class LbLinkNetWorkStatisticServiceImpl implements NetWorkStatisticServic
 
 
     }
-
-
 
 
     public List<NetWorkDetailDto> getNetWorkDetailList(NetWorkRequest request) {

@@ -3,10 +3,7 @@ package com.alioo.monitor.controller;
 import com.alioo.monitor.controller.dto.AccessCtrlRequest;
 import com.alioo.monitor.controller.dto.NetWorkRequest;
 import com.alioo.monitor.service.NetWorkStatisticService;
-import com.alioo.monitor.service.dto.LbStatisticDto;
-import com.alioo.monitor.service.dto.NetWorkDetailDto;
-import com.alioo.monitor.service.dto.NetWorkOnLineDto;
-import com.alioo.monitor.service.dto.UnavailableTimeDto;
+import com.alioo.monitor.service.dto.*;
 import com.alioo.monitor.util.DateTimeUtil;
 import com.alioo.monitor.util.JsonUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -32,10 +29,18 @@ public class NetWorkStatisticController {
 
     @RequestMapping("/getMachineList")
     public LbStatisticDto getMachineList() {
-        log.info("statistic/getList...");
+        log.info("statistic/getMachineList...");
 
 
         LbStatisticDto list = netWorkStatisticService.getMachineList();
+        return list;
+    }
+
+    @RequestMapping("/getMachineList2")
+    public List<Terminal2> getMachineList2() {
+        log.info("statistic/getMachineList2...");
+
+        List<Terminal2> list = netWorkStatisticService.getMachineList2();
         return list;
     }
 
@@ -43,14 +48,14 @@ public class NetWorkStatisticController {
      * @return
      */
     @RequestMapping("/setNetWorkSwitch")
-    public LbStatisticDto setNetWorkSwitch(AccessCtrlRequest request) {
+    public List<Terminal2> setNetWorkSwitch(AccessCtrlRequest request) {
         log.info("statistic/setNetWorkSwitch...request:" + JsonUtil.toJson(request));
         if (request.getMac() == null) {
             return null;
         }
         boolean flag = netWorkStatisticService.setNetWorkSwitch(request);
         log.info("设置网络结果request:{},flag:{}", JsonUtil.toJson(request), flag);
-        return getMachineList();
+        return getMachineList2();
     }
 
 
