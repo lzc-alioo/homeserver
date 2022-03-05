@@ -17,7 +17,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
-import java.io.File;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -75,8 +74,9 @@ public class LbLinkNetWorkStatisticServiceImpl implements NetWorkStatisticServic
 
         List<Terminal2> list = lbStatisticDto.getTerminals().stream()
                 .map(terminal -> {
+
                     Terminal2 terminal2 = new Terminal2();
-                    terminal2.setName(terminal.getName());
+                    terminal2.setName(AppConfig.getNameAlias(terminal.getMac(),terminal.getName()));
                     terminal2.setIp(terminal.getIp());
                     terminal2.setMac(terminal.getMac());
 
@@ -128,7 +128,7 @@ public class LbLinkNetWorkStatisticServiceImpl implements NetWorkStatisticServic
             return;
         }
 
-        lbStatisticDto.getTerminals().forEach(terminal -> terminal.setOrder(AppConfig.orderdMacMap.getOrDefault(terminal.getMac(), 10000)));
+        lbStatisticDto.getTerminals().forEach(terminal -> terminal.setOrder(AppConfig.getOrder(terminal.getMac(), 10000)));
 
         Collections.sort(lbStatisticDto.getTerminals());
     }
@@ -245,7 +245,7 @@ public class LbLinkNetWorkStatisticServiceImpl implements NetWorkStatisticServic
                                 .append(terminal.getUpSpeed());
 
 
-                        FileUtil.writeFile(realmonitorpath + terminal.getName(), Arrays.asList(sb.toString()), true);
+                        FileUtil.writeFile(realmonitorpath + AppConfig.getNameAlias(terminal.getMac(),terminal.getName()), Arrays.asList(sb.toString()), true);
 
                     });
 

@@ -56,9 +56,9 @@ public class Application implements CommandLineRunner {
 
 //        flowStatisticService.getList();
 
-        InetSocketAddress address = new InetSocketAddress(ip, port);
-        log.info("NettyServer启动成功.... . ... " + ip + ":" + port);
-        nettyServer.start(address);
+//        InetSocketAddress address = new InetSocketAddress(ip, port);
+//        log.info("NettyServer启动成功.... . ... " + ip + ":" + port);
+//        nettyServer.start(address);
 
     }
 

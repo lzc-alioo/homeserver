@@ -97,7 +97,7 @@ public class FileUtil {
             fw.flush();
             fw.close();
         } catch (Exception e) {
-            logger.error("写入文件[" + path + "]时异常", e);
+            logger.error("写入文件[" + path + "]时异常,list:"+list, e);
         } finally {
             if (fw != null) {
                 try {
@@ -113,7 +113,8 @@ public class FileUtil {
         try {
             File file = new File(path);
             if (!file.exists()) {
-                file.mkdirs();
+                boolean flag=file.mkdirs();
+
             }
         } catch (Exception e) {
             e.printStackTrace();
