@@ -7,6 +7,7 @@ import com.alioo.monitor.service.NetWorkStatisticService;
 import com.alioo.monitor.service.component.NetWorkComponent;
 import com.alioo.monitor.service.component.UnavailableTimeComponent;
 import com.alioo.monitor.service.dto.*;
+import com.alioo.monitor.tv.LeTvControl;
 import com.alioo.monitor.util.DateTimeUtil;
 import com.alioo.monitor.util.FileUtil;
 import com.alioo.monitor.util.HttpUtil;
@@ -113,7 +114,7 @@ public class LbLinkNetWorkStatisticServiceImpl implements NetWorkStatisticServic
             //{ "opt": "host_if", "fname": "system", "function": "get", "terminals": [ { "mac": "80:0C:67:1F:69:F7", "flag": "FTFFFFTFFTFF", "ls": 0, "ls_up": 0 }, { "mac": "70:48:0F:52:ED:C1", "flag": "FTFFFFTFFTFF", "ls": 0, "ls_up": 0 }, { "mac": "DC:A6:32:23:35:D4", "flag": "FTFFFFTFFTFF", "ls": 0, "ls_up": 0 }, { "mac": "48:3C:0C:74:9B:F0", "flag": "FTFFFFTFFTFF", "ls": 0, "ls_up": 0 }, { "mac": "38:F9:D3:2E:B6:DF", "flag": "TTFFFFTFFTFF", "ls": 0, "ls_up": 0 }, { "mac": "78:0F:77:62:47:E0", "flag": "FTFFFFTFFTFF", "ls": 0, "ls_up": 0 }, { "mac": "A4:83:E7:3C:3F:3D", "flag": "FFFFFFTFFTFF", "ls": 0, "ls_up": 0 }, { "mac": "B8:FC:9A:3E:6A:DC", "flag": "FFFFFFFFFTFF", "ls": 0, "ls_up": 0 }, { "mac": "E4:A3:2F:2D:29:00", "flag": "FFFFFFFFFTFF", "ls": 0, "ls_up": 0 } ], "error": 0 }%                                                                                                                                                                           alioo@alioo15 ~ %
             LbStatisticDto lbStatisticDto = JsonUtil.fromJson(ret, LbStatisticDto.class);
             sortTerminals(lbStatisticDto);
-            log.info("lbStatisticDto信息：{}", JsonUtil.toJson(lbStatisticDto));
+//            log.info("machine原始信息：{}", JsonUtil.toJson(lbStatisticDto));
 
             return lbStatisticDto;
 
@@ -187,7 +188,8 @@ public class LbLinkNetWorkStatisticServiceImpl implements NetWorkStatisticServic
             String now = DateTimeUtil.getDateTimeString("HH:mm");
 
             List<UnavailableTimeDto> list = getUnavailableTimeList();
-            log.info("scheduled checkNetWork now:{},tmplist{}", now, JsonUtil.toJson(list));
+            log.info("scheduled checkNetWork now:{},tmplist{}", now, list);
+
 
             list.forEach(obj -> {
                 if (now.equals(obj.getStartTimeStr())) {
@@ -196,6 +198,13 @@ public class LbLinkNetWorkStatisticServiceImpl implements NetWorkStatisticServic
                     request.setMac(macLetv);
                     request.setAct("on");
                     setNetWorkSwitch(request);
+
+                    List<Terminal2> machineList2 = getMachineList2();
+                    Map<String,String> machineMap2=machineList2.stream().collect(Collectors.toMap(Terminal2::getMac, Terminal2::getIp));
+                    LeTvControl.sendCommond(machineMap2.get(macLetv),9900,"return");
+                    LeTvControl.sendCommond(machineMap2.get(macLetv),9900,"ok");
+                    LeTvControl.sendCommond(machineMap2.get(macLetv),9900,"return");
+                    LeTvControl.sendCommond(machineMap2.get(macLetv),9900,"ok");
                     return;
                 }
 
