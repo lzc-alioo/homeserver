@@ -21,7 +21,7 @@ public class NetSchedule {
     @PostConstruct
     private void init() {
         scheduledThreadPoolExecutor.scheduleAtFixedRate(() -> {
-            flowStatisticService.checkNetWork();
+            flowStatisticService.controlNetWork();
         }, 10L, 60L, TimeUnit.SECONDS);
 
 

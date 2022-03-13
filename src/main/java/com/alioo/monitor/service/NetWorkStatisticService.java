@@ -54,7 +54,7 @@ public interface NetWorkStatisticService {
     /**
      * 基于时间列表来检查网络是否应该开启/关闭
      */
-    void checkNetWork();
+    void controlNetWork();
 
     /**
      * 记录上网行为

@@ -182,18 +182,18 @@ public class LbLinkNetWorkStatisticServiceImpl implements NetWorkStatisticServic
     }
 
 
-    public void checkNetWork() {
+    public void controlNetWork() {
 
         try {
             String now = DateTimeUtil.getDateTimeString("HH:mm");
 
-            List<UnavailableTimeDto> list = getUnavailableTimeList();
-            log.info("scheduled checkNetWork now:{},tmplist{}", now, list);
+            List<UnavailableTimeDto> timeList = getUnavailableTimeList();
+            log.info("scheduled controlNetWork now:{},timeList{}", now, timeList);
 
 
-            list.forEach(obj -> {
+            timeList.forEach(obj -> {
                 if (now.equals(obj.getStartTimeStr())) {
-                    log.info("checkNetWork scheduled 命中开始时间:{}", obj.getStartTimeStr());
+                    log.info("controlNetWork scheduled 命中开始时间:{}", obj.getStartTimeStr());
                     AccessCtrlRequest request = new AccessCtrlRequest();
                     request.setMac(macLetv);
                     request.setAct("on");
@@ -201,15 +201,13 @@ public class LbLinkNetWorkStatisticServiceImpl implements NetWorkStatisticServic
 
                     List<Terminal2> machineList2 = getMachineList2();
                     Map<String,String> machineMap2=machineList2.stream().collect(Collectors.toMap(Terminal2::getMac, Terminal2::getIp));
-                    LeTvControl.sendCommond(machineMap2.get(macLetv),9900,"return");
-                    LeTvControl.sendCommond(machineMap2.get(macLetv),9900,"ok");
-                    LeTvControl.sendCommond(machineMap2.get(macLetv),9900,"return");
-                    LeTvControl.sendCommond(machineMap2.get(macLetv),9900,"ok");
+                    LeTvControl.sendCommond(machineMap2.get(macLetv),9900,"power");
+
                     return;
                 }
 
                 if (now.equals(obj.getEndTimeStr())) {
-                    log.info("checkNetWork scheduled 命中结束时间:{}", obj.getEndTimeStr());
+                    log.info("controlNetWork scheduled 命中结束时间:{}", obj.getEndTimeStr());
                     AccessCtrlRequest request = new AccessCtrlRequest();
                     request.setMac(macLetv);
                     request.setAct("off");
