@@ -13,4 +13,12 @@ public class NetWorkDto {
     private String timeStr;
     private long net;
 
+
+    @Override
+    public String toString() {
+        return "{" +
+                "timeStr:'" + timeStr + '\'' +
+                ", net:" + net +
+                '}';
+    }
 }

@@ -10,4 +10,9 @@ public class NetWorkDetailDto extends NetWorkDto {
     public NetWorkDetailDto(String timeStr, long net) {
         super(timeStr, net);
     }
+
+    @Override
+    public String toString() {
+        return super.toString();
+    }
 }
