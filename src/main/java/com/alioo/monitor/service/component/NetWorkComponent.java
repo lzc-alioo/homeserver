@@ -117,7 +117,6 @@ public class NetWorkComponent {
     }
 
 
-
     public List<NetWorkOnLineDto> getNewWorkOnLineList(Map<String, List<String>> groupMap) {
         List<NetWorkOnLineDto> list2 = new ArrayList<>();
 
@@ -140,7 +139,8 @@ public class NetWorkComponent {
     }
 
 
-
+    //数据样例 00:39,B8:FC:9A:3E:6A:DC,,0,0
+    //数据样例 13:06,B8:FC:9A:3E:6A:DC,192.168.16.214,0,0
     private NetWorkOnLineDto getNetWorkOnLineDto(String timeStr, List<String> list) {
         if (list == null || list.isEmpty()) {
             return new NetWorkOnLineDto(timeStr, 0);
@@ -159,8 +159,6 @@ public class NetWorkComponent {
         return new NetWorkOnLineDto(timeStr, netSum);
 
     }
-
-
 
 
     public List getSubList(NetWorkRequest request, List<? extends NetWorkDto> list2) {
