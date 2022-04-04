@@ -5,7 +5,7 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class LbStatisticDto {
+public class LbStatistic {
 
 //"opt": "main",
 //"fname": "system",

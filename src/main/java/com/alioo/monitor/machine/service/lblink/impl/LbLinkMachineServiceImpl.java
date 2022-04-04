@@ -11,9 +11,9 @@ import com.alioo.monitor.machine.service.domian.NetDetail;
 import com.alioo.monitor.machine.service.domian.NetOnline;
 import com.alioo.monitor.machine.service.domian.Terminal;
 import com.alioo.monitor.machine.service.lblink.dto.LbResult;
-import com.alioo.monitor.machine.service.lblink.dto.LbStatisticDto;
+import com.alioo.monitor.machine.service.lblink.dto.LbStatistic;
 import com.alioo.monitor.machine.service.lblink.dto.LbTerminal;
-import com.alioo.monitor.machine.service.lblink.dto.LbTokenDto;
+import com.alioo.monitor.machine.service.lblink.dto.LbToken;
 import com.alioo.monitor.machine.tv.LeTvControl;
 import com.alioo.monitor.util.DateTimeUtil;
 import com.alioo.monitor.util.FileUtil;
@@ -58,7 +58,7 @@ public class LbLinkMachineServiceImpl implements MachineService {
             }
 
             //{ "opt": "login", "fname": "system", "function": "set", "token": "B65FC5DC95A91524866BBC91B9C20625", "error": 0 }
-            LbTokenDto loginDto = JsonUtil.fromJson(ret, LbTokenDto.class);
+            LbToken loginDto = JsonUtil.fromJson(ret, LbToken.class);
             log.info("token信息：{}", JsonUtil.toJson(loginDto));
 
             if (loginDto != null) {
@@ -75,9 +75,9 @@ public class LbLinkMachineServiceImpl implements MachineService {
     public List<Terminal> getMachineList() {
 
         String token = getToken();
-        LbStatisticDto lbStatisticDto = getMachineList(token);
+        LbStatistic lbStatistic = getMachineList(token);
 
-        List<Terminal> list = lbStatisticDto.getTerminals().stream()
+        List<Terminal> list = lbStatistic.getTerminals().stream()
                 .map(terminal -> {
 
                     Terminal terminal2 = new Terminal();
@@ -98,7 +98,7 @@ public class LbLinkMachineServiceImpl implements MachineService {
         return list;
     }
 
-    private LbStatisticDto getMachineList(String token) {
+    private LbStatistic getMachineList(String token) {
         try {
 
             String myurl = "http://192.168.16.1/protocol.csp?token=" + token;
@@ -116,11 +116,11 @@ public class LbLinkMachineServiceImpl implements MachineService {
             }
 
             //{ "opt": "host_if", "fname": "system", "function": "get", "terminals": [ { "mac": "80:0C:67:1F:69:F7", "flag": "FTFFFFTFFTFF", "ls": 0, "ls_up": 0 }, { "mac": "70:48:0F:52:ED:C1", "flag": "FTFFFFTFFTFF", "ls": 0, "ls_up": 0 }, { "mac": "DC:A6:32:23:35:D4", "flag": "FTFFFFTFFTFF", "ls": 0, "ls_up": 0 }, { "mac": "48:3C:0C:74:9B:F0", "flag": "FTFFFFTFFTFF", "ls": 0, "ls_up": 0 }, { "mac": "38:F9:D3:2E:B6:DF", "flag": "TTFFFFTFFTFF", "ls": 0, "ls_up": 0 }, { "mac": "78:0F:77:62:47:E0", "flag": "FTFFFFTFFTFF", "ls": 0, "ls_up": 0 }, { "mac": "A4:83:E7:3C:3F:3D", "flag": "FFFFFFTFFTFF", "ls": 0, "ls_up": 0 }, { "mac": "B8:FC:9A:3E:6A:DC", "flag": "FFFFFFFFFTFF", "ls": 0, "ls_up": 0 }, { "mac": "E4:A3:2F:2D:29:00", "flag": "FFFFFFFFFTFF", "ls": 0, "ls_up": 0 } ], "error": 0 }%                                                                                                                                                                           alioo@alioo15 ~ %
-            LbStatisticDto lbStatisticDto = JsonUtil.fromJson(ret, LbStatisticDto.class);
-            sortTerminals(lbStatisticDto);
-//            log.info("machine原始信息：{}", JsonUtil.toJson(lbStatisticDto));
+            LbStatistic lbStatistic = JsonUtil.fromJson(ret, LbStatistic.class);
+            sortTerminals(lbStatistic);
+//            log.info("machine原始信息：{}", JsonUtil.toJson(lbStatistic));
 
-            return lbStatisticDto;
+            return lbStatistic;
 
         } catch (Exception e) {
             log.error("获取统计数据时出现异常", e);
@@ -128,14 +128,14 @@ public class LbLinkMachineServiceImpl implements MachineService {
         return null;
     }
 
-    private void sortTerminals(LbStatisticDto lbStatisticDto) {
-        if (lbStatisticDto == null || lbStatisticDto.getTerminals() == null || lbStatisticDto.getTerminals().isEmpty()) {
+    private void sortTerminals(LbStatistic lbStatistic) {
+        if (lbStatistic == null || lbStatistic.getTerminals() == null || lbStatistic.getTerminals().isEmpty()) {
             return;
         }
 
-        lbStatisticDto.getTerminals().forEach(terminal -> terminal.setOrder(AppConfig.getOrder(terminal.getMac(), 10000)));
+        lbStatistic.getTerminals().forEach(terminal -> terminal.setOrder(AppConfig.getOrder(terminal.getMac(), 10000)));
 
-        Collections.sort(lbStatisticDto.getTerminals());
+        Collections.sort(lbStatistic.getTerminals());
     }
 
 
@@ -234,8 +234,8 @@ public class LbLinkMachineServiceImpl implements MachineService {
             log.info("scheduled monitorNetWork now:{}", now);
 
             String token = getToken();
-            LbStatisticDto lbStatisticDto = getMachineList(token);
-            List<LbTerminal> terminals = lbStatisticDto.getTerminals();
+            LbStatistic lbStatistic = getMachineList(token);
+            List<LbTerminal> terminals = lbStatistic.getTerminals();
 
             String realmonitorpath = this.monitorpath + "/" + DateTimeUtil.getDateTimeString("yyyyMMdd") + "/";
 
