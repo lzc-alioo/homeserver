@@ -3,8 +3,8 @@ package com.alioo.monitor.machine.service;
 import com.alioo.monitor.machine.controller.request.AccessControlCommand;
 import com.alioo.monitor.machine.controller.request.NetWorkQuery;
 import com.alioo.monitor.machine.service.domian.DisabledTime;
-import com.alioo.monitor.machine.service.domian.NetDetail;
-import com.alioo.monitor.machine.service.domian.NetOnline;
+import com.alioo.monitor.machine.service.domian.Net;
+import com.alioo.monitor.machine.service.domian.Online;
 import com.alioo.monitor.machine.service.domian.Terminal;
 
 import java.util.List;
@@ -64,7 +64,7 @@ public interface MachineService {
      * @param request startTime  示例：202110020000 ;endTime    示例：202110022359
      * @return
      */
-    List<NetDetail> getNetDetailList(NetWorkQuery request);
+    List<Net> getNetList(NetWorkQuery request);
 
 
     /**
@@ -73,7 +73,7 @@ public interface MachineService {
      * @param request startTime  示例：202110020000 ;endTime    示例：202110022359
      * @return
      */
-    List<NetOnline> getNetOnlineList(NetWorkQuery request);
+    List<Online> getOnlineList(NetWorkQuery request);
 
 
 }

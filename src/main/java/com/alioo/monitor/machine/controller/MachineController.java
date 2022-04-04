@@ -4,8 +4,8 @@ import com.alioo.monitor.machine.controller.request.AccessControlCommand;
 import com.alioo.monitor.machine.controller.request.NetWorkQuery;
 import com.alioo.monitor.machine.service.MachineService;
 import com.alioo.monitor.machine.service.domian.DisabledTime;
-import com.alioo.monitor.machine.service.domian.NetDetail;
-import com.alioo.monitor.machine.service.domian.NetOnline;
+import com.alioo.monitor.machine.service.domian.Net;
+import com.alioo.monitor.machine.service.domian.Online;
 import com.alioo.monitor.machine.service.domian.Terminal;
 import com.alioo.monitor.util.DateTimeUtil;
 import com.alioo.monitor.util.JsonUtil;
@@ -16,7 +16,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RestController
@@ -81,12 +84,37 @@ public class MachineController {
     }
 
 
-    @RequestMapping("/getNetDetailList")
-    public List<NetDetail> getNetWorkData(NetWorkQuery request) {
+    @RequestMapping("/getMonitorMachineList")
+    public List<Terminal> getMonitorMachineList() {
+        log.info("machine/getMonitorMachineList...");
+
+        List<Terminal> list = machineService.getMachineList();
+
+
+        Set<String> filterNameSet = new HashSet<>();
+        filterNameSet.add("switch1");
+        filterNameSet.add("switch2");
+        filterNameSet.add("raspberrypi");
+        filterNameSet.add("raspberrypi-usb");
+
+        list = list.stream().filter(terminal -> {
+            if(filterNameSet.contains(terminal.getName())){
+                return false;
+            }
+            return true;
+
+        }).collect(Collectors.toList());
+
+        return list;
+    }
+
+
+    @RequestMapping("/getNetList")
+    public List<Net> getNetList(NetWorkQuery request) {
 
         checkParams(request);
 
-        List<NetDetail> list = machineService.getNetDetailList(request);
+        List<Net> list = machineService.getNetList(request);
 
         return list;
     }
@@ -107,12 +135,12 @@ public class MachineController {
     }
 
 
-    @RequestMapping("/getNetOnlineList")
-    public List<NetOnline> getNetOnlineList(NetWorkQuery request) {
+    @RequestMapping("/getOnlineList")
+    public List<Online> getOnlineList(NetWorkQuery request) {
 
         checkParams(request);
 
-        List<NetOnline> list = machineService.getNetOnlineList(request);
+        List<Online> list = machineService.getOnlineList(request);
 
         return list;
 

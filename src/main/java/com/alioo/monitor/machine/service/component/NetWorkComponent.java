@@ -1,9 +1,9 @@
 package com.alioo.monitor.machine.service.component;
 
 import com.alioo.monitor.machine.controller.request.NetWorkQuery;
-import com.alioo.monitor.machine.service.domian.NetData;
-import com.alioo.monitor.machine.service.domian.NetDetail;
-import com.alioo.monitor.machine.service.domian.NetOnline;
+import com.alioo.monitor.machine.service.domian.NetBase;
+import com.alioo.monitor.machine.service.domian.Net;
+import com.alioo.monitor.machine.service.domian.Online;
 import com.alioo.monitor.util.FileUtil;
 import com.alioo.monitor.util.JsonUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -78,8 +78,8 @@ public class NetWorkComponent {
     }
 
 
-    public List<NetDetail> getNetDetailList(Map<String, List<String>> groupMap) {
-        List<NetDetail> list2 = new ArrayList<>();
+    public List<Net> getNetList(Map<String, List<String>> groupMap) {
+        List<Net> list2 = new ArrayList<>();
 
         for (int hh = 0; hh < 24; hh++) {
             String hhStr = hh < 10 ? "0" + hh : "" + hh;
@@ -89,8 +89,8 @@ public class NetWorkComponent {
                 String timeStr = hhStr + ":" + minute5Str;
                 List<String> list = groupMap.get(timeStr);
 
-                NetDetail netDetail = getNetWorkDetailDto(timeStr, list);
-                list2.add(netDetail);
+                Net net = getNetWorkDetailDto(timeStr, list);
+                list2.add(net);
 
             }
 
@@ -100,9 +100,9 @@ public class NetWorkComponent {
         return list2;
     }
 
-    private NetDetail getNetWorkDetailDto(String timeStr, List<String> list) {
+    private Net getNetWorkDetailDto(String timeStr, List<String> list) {
         if (list == null || list.isEmpty()) {
-            return new NetDetail(timeStr, 0);
+            return new Net(timeStr, 0);
         }
 
         Long netSum = list.stream().map(str -> {
@@ -112,13 +112,13 @@ public class NetWorkComponent {
 
         }).reduce(Long::sum).get();
 
-        return new NetDetail(timeStr, netSum);
+        return new Net(timeStr, netSum);
 
     }
 
 
-    public List<NetOnline> getNetOnlineList(Map<String, List<String>> groupMap) {
-        List<NetOnline> list2 = new ArrayList<>();
+    public List<Online> getOnlineList(Map<String, List<String>> groupMap) {
+        List<Online> list2 = new ArrayList<>();
 
         for (int hh = 0; hh < 24; hh++) {
             String hhStr = hh < 10 ? "0" + hh : "" + hh;
@@ -128,7 +128,7 @@ public class NetWorkComponent {
                 String timeStr = hhStr + ":" + minute5Str;
                 List<String> list = groupMap.get(timeStr);
 
-                NetOnline netWorkDataDto = getNetWorkOnLineDto(timeStr, list);
+                Online netWorkDataDto = getNetWorkOnLineDto(timeStr, list);
                 list2.add(netWorkDataDto);
 
             }
@@ -141,9 +141,9 @@ public class NetWorkComponent {
 
     //数据样例 00:39,B8:FC:9A:3E:6A:DC,,0,0
     //数据样例 13:06,B8:FC:9A:3E:6A:DC,192.168.16.214,0,0
-    private NetOnline getNetWorkOnLineDto(String timeStr, List<String> list) {
+    private Online getNetWorkOnLineDto(String timeStr, List<String> list) {
         if (list == null || list.isEmpty()) {
-            return new NetOnline(timeStr, 0);
+            return new Online(timeStr, 0);
         }
 
         Long netSum = list.stream().map(str -> {
@@ -156,12 +156,12 @@ public class NetWorkComponent {
 
         }).reduce(Long::sum).get();
 
-        return new NetOnline(timeStr, netSum);
+        return new Online(timeStr, netSum);
 
     }
 
 
-    public List getSubList(NetWorkQuery request, List<? extends NetData> list2) {
+    public List getSubList(NetWorkQuery request, List<? extends NetBase> list2) {
         String startTimeStr = request.getStartTime().substring(8, 10) + ":" + request.getStartTime().substring(10, 12);
         String endTimeStr = request.getEndTime().substring(8, 10) + ":" + request.getEndTime().substring(10, 12);
 

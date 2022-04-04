@@ -7,8 +7,8 @@ import com.alioo.monitor.machine.service.MachineService;
 import com.alioo.monitor.machine.service.component.NetWorkComponent;
 import com.alioo.monitor.machine.service.component.DisabledTimeComponent;
 import com.alioo.monitor.machine.service.domian.DisabledTime;
-import com.alioo.monitor.machine.service.domian.NetDetail;
-import com.alioo.monitor.machine.service.domian.NetOnline;
+import com.alioo.monitor.machine.service.domian.Net;
+import com.alioo.monitor.machine.service.domian.Online;
 import com.alioo.monitor.machine.service.domian.Terminal;
 import com.alioo.monitor.machine.service.lblink.dto.LbResult;
 import com.alioo.monitor.machine.service.lblink.dto.LbStatistic;
@@ -269,30 +269,30 @@ public class LbLinkMachineServiceImpl implements MachineService {
     }
 
 
-    public List<NetDetail> getNetDetailList(NetWorkQuery request) {
+    public List<Net> getNetList(NetWorkQuery request) {
 
         String dateStr = request.getStartTime().substring(0, 8);
 
         Map<String, List<String>> groupMap = netWorkComponent.getNetWorkGroup(dateStr, request.getMachineName());
 
-        List<NetDetail> list2 = netWorkComponent.getNetDetailList(groupMap);
+        List<Net> list2 = netWorkComponent.getNetList(groupMap);
 
-        List<NetDetail> list3 = netWorkComponent.getSubList(request, list2);
+        List<Net> list3 = netWorkComponent.getSubList(request, list2);
 
         return list3;
 
     }
 
 
-    public List<NetOnline> getNetOnlineList(NetWorkQuery request) {
+    public List<Online> getOnlineList(NetWorkQuery request) {
 
         String dateStr = request.getStartTime().substring(0, 8);
 
         Map<String, List<String>> groupMap = netWorkComponent.getNetWorkGroup(dateStr, request.getMachineName());
 
-        List<NetOnline> list2 = netWorkComponent.getNetOnlineList(groupMap);
+        List<Online> list2 = netWorkComponent.getOnlineList(groupMap);
 
-        List<NetOnline> list3 = netWorkComponent.getSubList(request, list2);
+        List<Online> list3 = netWorkComponent.getSubList(request, list2);
 
         return list3;
     }
