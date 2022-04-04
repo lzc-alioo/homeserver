@@ -1,4 +1,3 @@
-
 app:
   timepath: /home/pi/work/build/time.txt
   monitorpath: /home/pi/work/build/monitor

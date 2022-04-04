@@ -5,10 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
     <title>Title</title>
-    <script type="text/javascript" src="/js/jquery.js" ></script>
-    <script type="text/javascript" src="/js/jquery.cookie.js" ></script>
+    <script type="text/javascript" src="/js/jquery.js"></script>
+    <script type="text/javascript" src="/js/jquery.cookie.js"></script>
     <style type="text/css">
-        #container{
+        #container {
             margin-top: 50px;
             text-align: center;
         }
@@ -16,7 +16,7 @@
 </head>
 <body>
 <div id="container">
-<input id="btn-login" type="button" value="免密登录"/>
+    <input id="btn-login" type="button" value="免密登录"/>
 
 </div>
 
@@ -28,21 +28,21 @@
 
 <script type="text/javascript">
 
-    $(document).ready(function() {
+    $(document).ready(function () {
         console.log("design by alioo");
 
         $("#btn-login").click(function () {
             $("#btn-login").val("免密登录中...");
-            var tokenData=null;
+            var tokenData = null;
             $(function () {
                 $.ajax("http://192.168.16.198:8080/protocol.csp?token=B5AE4CA22A475F83F8DC195A23058264&fname=system&opt=login&function=set&usrid=f11fcbaac530c673a91c6022a49c2219")
-                    .success(function(data) {
-                        console.log("data="+data);
-                        tokenData=$.parseJSON(data);
-                        var token=tokenData.token;
-                        $.cookie('lstatus','true');
-                        $.cookie('token'  ,token);
-                        window.location.href="http://192.168.16.198:8080/user/index.html";
+                    .success(function (data) {
+                        console.log("data=" + data);
+                        tokenData = $.parseJSON(data);
+                        var token = tokenData.token;
+                        $.cookie('lstatus', 'true');
+                        $.cookie('token', token);
+                        window.location.href = "http://192.168.16.198:8080/user/index.html";
                     });
             })
         })

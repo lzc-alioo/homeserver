@@ -11,7 +11,6 @@ public class JsonUtil {
     }
 
 
-
     public static String toJson(Object object) {
         try {
             return objectMapper.writeValueAsString(object);
@@ -21,9 +20,9 @@ public class JsonUtil {
         return null;
     }
 
-    public static <T> T fromJson(String json,Class<T> object) {
+    public static <T> T fromJson(String json, Class<T> object) {
         try {
-            return objectMapper.readValue(json,object);
+            return objectMapper.readValue(json, object);
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }

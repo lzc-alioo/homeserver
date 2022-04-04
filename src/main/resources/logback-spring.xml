@@ -68,7 +68,7 @@
     </appender>
 
     <!--<logger name="com.example.demo" level="INFO" additivity="false">-->
-        <!--<appender-ref ref="NET"/>-->
+    <!--<appender-ref ref="NET"/>-->
     <!--</logger>-->
 
     <!--指定基础的日志输出级别-->

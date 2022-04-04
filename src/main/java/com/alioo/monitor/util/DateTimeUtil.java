@@ -255,7 +255,6 @@ public class DateTimeUtil {
     }
 
 
-
     /**
      * 获取指定日期后几秒对应的当前时间
      *
@@ -388,9 +387,9 @@ public class DateTimeUtil {
     public static void main(String[] args) {
         for (int i = 0; i < 100; i++) {
             String datestr = DateTimeUtil.getNextDateString(i);
-            Date date = DateTimeUtil.toDateFromStr(datestr+" 00:00:00");
+            Date date = DateTimeUtil.toDateFromStr(datestr + " 00:00:00");
             String str = DateTimeUtil.getFirstAndLastOfWeek(date, "yyyy-MM-dd");
-            System.out.println(datestr+"=" + str);
+            System.out.println(datestr + "=" + str);
         }
 
     }

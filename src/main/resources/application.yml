@@ -8,8 +8,8 @@ netty:
 
 server:
   port: 8081
-#  error:
-#    path: /error
+  #  error:
+  #    path: /error
   #内嵌tomcat日志
   tomcat:
     accesslog:

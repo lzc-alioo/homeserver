@@ -41,9 +41,9 @@ public class HttpUtil {
             if (responseEntity != null) {
                 ret = EntityUtils.toString(responseEntity);
                 //log.info("响应长度:" + responseEntity.getContentLength());
-                String tmp=ret;
-                long length=0;
-                if(ret!=null && ret.length()>100){
+                String tmp = ret;
+                long length = 0;
+                if (ret != null && ret.length() > 100) {
                     tmp = ret.substring(0, 100);
                     length = ret.length();
                 }
@@ -81,7 +81,7 @@ public class HttpUtil {
 
         addHeaders(httpPost, headers);
 
-        addDatas(httpPost,datas);
+        addDatas(httpPost, datas);
 
         // 响应模型
         CloseableHttpResponse response = null;
@@ -96,9 +96,9 @@ public class HttpUtil {
             if (responseEntity != null) {
                 ret = EntityUtils.toString(responseEntity);
                 //log.info("响应长度:" + responseEntity.getContentLength());
-                String tmp=ret;
-                long length=ret.length();
-                if(ret!=null && ret.length()>100){
+                String tmp = ret;
+                long length = ret.length();
+                if (ret != null && ret.length() > 100) {
                     tmp = ret.substring(0, 100);
                 }
 //                log.info("响应内容快照length:{},tmp:{}" ,length,tmp);
@@ -127,7 +127,6 @@ public class HttpUtil {
     }
 
 
-
     private static void addHeaders(HttpRequestBase request, Map<String, String> headers) {
 
         if (headers == null || headers.isEmpty()) {
@@ -148,7 +147,6 @@ public class HttpUtil {
         }
 
 
-
         StringBuilder builder = new StringBuilder();
         for (Map.Entry<String, String> entry : datas.entrySet()) {
             builder.append(entry.getKey() + "=" + entry.getValue() + "&");
@@ -159,11 +157,6 @@ public class HttpUtil {
         request.setEntity(postingString);
 
     }
-
-
-
-
-
 
 
 }
