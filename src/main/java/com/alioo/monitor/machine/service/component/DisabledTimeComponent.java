@@ -21,29 +21,30 @@ public class DisabledTimeComponent {
     private List<DisabledTime> list = new ArrayList<>();
 
 
-    public List<DisabledTime> getUnavailableTimeList() {
+    public List<DisabledTime> getDisabledTimeList() {
 
         if (list != null && !list.isEmpty()) {
             return list;
         }
 
 //        time.txt example
-//        09:00,09:10
-//        20:00,20:10
-//        21:00,23:59
+//        19:40,20:00,1
+//        20:01,20:03,0
+//        21:23,23:59,1
         List<String> tmplist = FileUtil.readFile2List(timepath);
         log.info("readfile timepath:" + timepath, "tmplist=" + tmplist);
 
         List<DisabledTime> disabledTimeList = tmplist.stream()
                 .map(str -> {
                     String[] arr = str.split(",");
-                    if (arr.length != 2) {
+                    if (arr.length != 3) {
                         return null;
                     }
                     String startTimeStr = arr[0];
                     String endTimeStr = arr[1];
+                    String checkedStr = arr[2];
 
-                    return new DisabledTime(startTimeStr, endTimeStr);
+                    return new DisabledTime(startTimeStr, endTimeStr,checkedStr);
 
                 })
                 .filter(dto -> dto != null)
@@ -65,7 +66,7 @@ public class DisabledTimeComponent {
 
         List<String> tmplist = list.stream()
                 .map(dto -> {
-                    return dto.getStartTimeStr() + "," + dto.getEndTimeStr();
+                    return dto.getStartTimeStr() + "," + dto.getEndTimeStr()+","+ dto.getCheckedStr();
                 })
                 .filter(dto -> dto != null)
                 .sorted()

@@ -170,7 +170,7 @@ public class LbLinkMachineServiceImpl implements MachineService {
 
     public List<DisabledTime> getDisabledTimeList() {
 
-        List<DisabledTime> list = disabledTimeComponent.getUnavailableTimeList();
+        List<DisabledTime> list = disabledTimeComponent.getDisabledTimeList();
 
         return list;
 
@@ -196,6 +196,10 @@ public class LbLinkMachineServiceImpl implements MachineService {
 
 
             timeList.forEach(obj -> {
+                if(!obj.isChecked()){
+                    return;
+                }
+
                 if (now.equals(obj.getStartTimeStr())) {
                     log.info("controlNetWork scheduled 命中开始时间:{}", obj.getStartTimeStr());
                     AccessControlCommand request = new AccessControlCommand();
