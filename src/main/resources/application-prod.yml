@@ -1,5 +1,5 @@
 app:
-  timepath: /home/pi/work/build/time.txt
+  timepath: /home/pi/work/build/time/tv.txt
   monitorpath: /home/pi/work/build/monitor
 
 server:

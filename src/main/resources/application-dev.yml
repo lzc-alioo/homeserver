@@ -1,5 +1,5 @@
 app:
-  timepath: /Users/alioo/work/temp/time.txt
+  timepath: /Users/alioo/work/temp/time/tv.txt
   monitorpath: /Users/alioo/work/temp/monitor
 
 server:
