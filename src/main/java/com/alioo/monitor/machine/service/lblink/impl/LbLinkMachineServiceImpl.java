@@ -6,6 +6,7 @@ import com.alioo.monitor.machine.controller.request.NetWorkQuery;
 import com.alioo.monitor.machine.service.MachineService;
 import com.alioo.monitor.machine.service.component.NetWorkComponent;
 import com.alioo.monitor.machine.service.component.DisabledTimeComponent;
+import com.alioo.monitor.machine.service.component.TokenComponent;
 import com.alioo.monitor.machine.service.domian.DisabledTime;
 import com.alioo.monitor.machine.service.domian.Net;
 import com.alioo.monitor.machine.service.domian.Online;
@@ -44,30 +45,13 @@ public class LbLinkMachineServiceImpl implements MachineService {
     @Autowired
     private NetWorkComponent netWorkComponent;
 
+    @Autowired
+    private TokenComponent tokenComponent;
+
 
     @Override
     public String getToken() {
-        try {
-            String myurl = "http://192.168.16.1/protocol.csp?fname=system&opt=login&function=set&usrid=f11fcbaac530c673a91c6022a49c2219";
-            Map<String, String> headers = netWorkComponent.getHeaderMap();
-            Map<String, String> datas = new LinkedHashMap<>();
-
-            String ret = HttpUtil.post(myurl, headers, datas);
-            if (ret == null) {
-                return null;
-            }
-
-            //{ "opt": "login", "fname": "system", "function": "set", "token": "B65FC5DC95A91524866BBC91B9C20625", "error": 0 }
-            LbToken loginDto = JsonUtil.fromJson(ret, LbToken.class);
-            log.info("token信息：{}", JsonUtil.toJson(loginDto));
-
-            if (loginDto != null) {
-                return loginDto.getToken();
-            }
-        } catch (Exception e) {
-            log.error("token信息异常", e);
-        }
-        return null;
+        return tokenComponent.getTokenWithCache();
     }
 
 
@@ -76,6 +60,9 @@ public class LbLinkMachineServiceImpl implements MachineService {
 
         String token = getToken();
         LbStatistic lbStatistic = getMachineList(token);
+        if (lbStatistic == null || lbStatistic.getTerminals() == null) {
+            return Collections.EMPTY_LIST;
+        }
 
         List<Terminal> list = lbStatistic.getTerminals().stream()
                 .map(terminal -> {
@@ -192,11 +179,11 @@ public class LbLinkMachineServiceImpl implements MachineService {
             String now = DateTimeUtil.getDateTimeString("HH:mm");
 
             List<DisabledTime> timeList = getDisabledTimeList();
-            log.info("scheduled controlNetWork now:{},timeList{}", now, timeList);
+            log.info("定时执行 controlNetWork now:{},timeList{}", now, timeList);
 
 
             timeList.forEach(obj -> {
-                if(!obj.isChecked()){
+                if (!obj.isChecked()) {
                     return;
                 }
 
@@ -208,8 +195,8 @@ public class LbLinkMachineServiceImpl implements MachineService {
                     accessControl(request);
 
                     List<Terminal> machineList2 = getMachineList();
-                    Map<String, String> machineMap2 = machineList2.stream().collect(Collectors.toMap(Terminal::getMac, Terminal::getIp));
-                    LeTvControl.sendCommond(machineMap2.get(macLetv), 9900, "power");
+                    Map<String, String> mapIpMap = machineList2.stream().collect(Collectors.toMap(Terminal::getMac, Terminal::getIp));
+                    LeTvControl.sendCommond(mapIpMap.get(macLetv), 9900, "power");
 
                     return;
                 }
@@ -235,11 +222,14 @@ public class LbLinkMachineServiceImpl implements MachineService {
         try {
             String now = DateTimeUtil.getDateTimeString("HH:mm");
 
-            log.info("scheduled monitorNetWork now:{}", now);
+            log.info("定时执行 monitorNetWork now:{}", now);
 
             String token = getToken();
             LbStatistic lbStatistic = getMachineList(token);
             List<LbTerminal> terminals = lbStatistic.getTerminals();
+            if (lbStatistic == null || lbStatistic.getTerminals() == null) {
+                return;
+            }
 
             String realmonitorpath = this.monitorpath + "/" + DateTimeUtil.getDateTimeString("yyyyMMdd") + "/";
 
