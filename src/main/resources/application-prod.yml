@@ -1,6 +1,8 @@
 app:
   timepath: /home/pi/work/build/time/tv.txt
   monitorpath: /home/pi/work/build/monitor
+  md5path: /home/pi/work/build/md5/
+  md5pattern: "000000"
 
 server:
   tomcat:

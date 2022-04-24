@@ -1,6 +1,9 @@
 app:
   timepath: /Users/alioo/work/temp/time/tv.txt
   monitorpath: /Users/alioo/work/temp/monitor
+  md5path: /Users/alioo/work/temp/md5/
+  md5pattern: "000000"
+
 
 server:
   tomcat:

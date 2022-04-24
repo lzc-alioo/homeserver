@@ -88,7 +88,7 @@ public class FileUtil {
         try {
             fw = new FileWriter(path, append);
 
-            StringBuffer content = new StringBuffer();
+//            StringBuffer content = new StringBuffer();
             for (String line : list) {
 //                fw.append(line).append("\r");
                 fw.append(line).append(separator);
