@@ -2,7 +2,7 @@
 #-- coding:utf-8 --
 #摇控器实验
 
-import pylirc, time
+import pylirc2, time
 
 blocking = 0
 
@@ -12,13 +12,13 @@ def loop():
 
     while True:
         s = pylirc.nextcode(1)
-        print 'nextcode: ',s
+        print('nextcode: ',s)
         time.sleep(1)
  
 
 if __name__ == '__main__':
 
-	pylirc.init("pylirc", "./conf", blocking)
+	pylirc2.init("pylirc", "./conf", blocking)
 	try:
         loop()
     except KeyboardInterrupt:
