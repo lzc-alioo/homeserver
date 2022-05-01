@@ -29,8 +29,8 @@ public class LbStatistic {
     private int totalUpspeed;
     private boolean connected;
     private int ontime;
-    private int curSpeed;
-    private int upSpeed;
+    private int curSpeed;//实时下载速度
+    private int upSpeed; //实时上传速度
     private int downBytes;
     private int upBytes;
 

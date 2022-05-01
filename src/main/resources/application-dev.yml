@@ -3,6 +3,7 @@ app:
   monitorpath: /Users/alioo/work/temp/monitor
   md5path: /Users/alioo/work/temp/md5/
   md5pattern: "000000"
+  md5sleep: 1000
 
 
 server:

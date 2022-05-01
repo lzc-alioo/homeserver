@@ -3,10 +3,7 @@ package com.alioo.monitor.machine.controller;
 import com.alioo.monitor.machine.controller.request.AccessControlCommand;
 import com.alioo.monitor.machine.controller.request.NetWorkQuery;
 import com.alioo.monitor.machine.service.MachineService;
-import com.alioo.monitor.machine.service.domian.DisabledTime;
-import com.alioo.monitor.machine.service.domian.Net;
-import com.alioo.monitor.machine.service.domian.Online;
-import com.alioo.monitor.machine.service.domian.Terminal;
+import com.alioo.monitor.machine.service.domian.*;
 import com.alioo.monitor.util.DateTimeUtil;
 import com.alioo.monitor.util.JsonUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -35,18 +32,18 @@ public class MachineController {
 
 
     @RequestMapping("/getMachineList")
-    public List<Terminal> getMachineList() {
+    public TerminalStatistic getMachineList() {
         log.info("machine/getMachineList...");
 
-        List<Terminal> list = machineService.getMachineList();
-        return list;
+        TerminalStatistic  terminalStatistic = machineService.getMachineList();
+        return terminalStatistic;
     }
 
     /**
      * @return
      */
     @RequestMapping("/accessControl")
-    public List<Terminal> accessControl(AccessControlCommand request) {
+    public TerminalStatistic accessControl(AccessControlCommand request) {
         log.info("machine/accessControl...request:" + JsonUtil.toJson(request));
         if (request.getMac() == null) {
             return null;
@@ -88,7 +85,7 @@ public class MachineController {
     public List<Terminal> getMonitorMachineList() {
         log.info("machine/getMonitorMachineList...");
 
-        List<Terminal> list = machineService.getMachineList();
+        List<Terminal> list = machineService.getMachineList().getList();
 
 
         Set<String> filterNameSet = new HashSet<>();

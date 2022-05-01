@@ -2,10 +2,7 @@ package com.alioo.monitor.machine.service;
 
 import com.alioo.monitor.machine.controller.request.AccessControlCommand;
 import com.alioo.monitor.machine.controller.request.NetWorkQuery;
-import com.alioo.monitor.machine.service.domian.DisabledTime;
-import com.alioo.monitor.machine.service.domian.Net;
-import com.alioo.monitor.machine.service.domian.Online;
-import com.alioo.monitor.machine.service.domian.Terminal;
+import com.alioo.monitor.machine.service.domian.*;
 
 import java.util.List;
 
@@ -24,7 +21,7 @@ public interface MachineService {
      *
      * @return
      */
-    List<Terminal> getMachineList();
+    TerminalStatistic getMachineList();
 
     /**
      * 根据mac地址控制单台机器的上网行为

@@ -7,10 +7,7 @@ import com.alioo.monitor.machine.service.MachineService;
 import com.alioo.monitor.machine.service.component.NetWorkComponent;
 import com.alioo.monitor.machine.service.component.DisabledTimeComponent;
 import com.alioo.monitor.machine.service.component.TokenComponent;
-import com.alioo.monitor.machine.service.domian.DisabledTime;
-import com.alioo.monitor.machine.service.domian.Net;
-import com.alioo.monitor.machine.service.domian.Online;
-import com.alioo.monitor.machine.service.domian.Terminal;
+import com.alioo.monitor.machine.service.domian.*;
 import com.alioo.monitor.machine.service.lblink.dto.LbResult;
 import com.alioo.monitor.machine.service.lblink.dto.LbStatistic;
 import com.alioo.monitor.machine.service.lblink.dto.LbTerminal;
@@ -28,6 +25,7 @@ import org.springframework.util.ObjectUtils;
 
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Slf4j
 @Service
@@ -56,12 +54,12 @@ public class LbLinkMachineServiceImpl implements MachineService {
 
 
     @Override
-    public List<Terminal> getMachineList() {
+    public TerminalStatistic getMachineList() {
 
         String token = getToken();
         LbStatistic lbStatistic = getMachineList(token);
         if (lbStatistic == null || lbStatistic.getTerminals() == null) {
-            return Collections.EMPTY_LIST;
+            return TerminalStatistic.builder().list(Collections.EMPTY_LIST).build();
         }
 
         List<Terminal> list = lbStatistic.getTerminals().stream()
@@ -82,7 +80,13 @@ public class LbLinkMachineServiceImpl implements MachineService {
                 })
                 .collect(Collectors.toList());
 
-        return list;
+        return TerminalStatistic.builder()
+                .downloadSpeed(lbStatistic.getCurSpeed())
+                .upSpeed(lbStatistic.getUpSpeed())
+                .onlineTime(lbStatistic.getOntime())
+                .list(list)
+                .build();
+
     }
 
     private LbStatistic getMachineList(String token) {
@@ -129,22 +133,25 @@ public class LbLinkMachineServiceImpl implements MachineService {
     public boolean accessControl(AccessControlCommand request) {
 
         try {
-            String token = getToken();
+            String macArr[] = request.getMac().split(",");
 
+            for (int i = 0; i < macArr.length; i++) {
 
-            String myurl = "http://192.168.16.1/protocol.csp?token=" + token + "&fname=net&opt=host_black&function=set&mac=" + request.getMac() + "&act=" + request.getAct();
-            Map<String, String> headers = netWorkComponent.getHeaderMap();
-            Map<String, String> datas = new LinkedHashMap<>();
+                String token = getToken();
 
-            String ret = HttpUtil.post(myurl, headers, datas);
-            if (ret == null) {
-                return false;
+                String myurl = "http://192.168.16.1/protocol.csp?token=" + token + "&fname=net&opt=host_black&function=set&mac=" + macArr[i] + "&act=" + request.getAct();
+                Map<String, String> headers = netWorkComponent.getHeaderMap();
+                Map<String, String> datas = new LinkedHashMap<>();
+
+                String ret = HttpUtil.post(myurl, headers, datas);
+                if (ret == null) {
+                    continue;
+                }
+
+                //{ "opt": "host_black", "fname": "net", "function": "set", "error": 0 }
+                LbResult lbResult = JsonUtil.fromJson(ret, LbResult.class);
+                log.info("accessCtrl信息：{}", JsonUtil.toJson(lbResult));
             }
-
-            //{ "opt": "host_black", "fname": "net", "function": "set", "error": 0 }
-            LbResult lbResult = JsonUtil.fromJson(ret, LbResult.class);
-            log.info("accessCtrl信息：{}", JsonUtil.toJson(lbResult));
-            return true;
 
         } catch (Exception e) {
             log.error("accessCtrl时出现异常", e);
@@ -154,6 +161,7 @@ public class LbLinkMachineServiceImpl implements MachineService {
         return true;
 
     }
+
 
     public List<DisabledTime> getDisabledTimeList() {
 
@@ -194,9 +202,11 @@ public class LbLinkMachineServiceImpl implements MachineService {
                     request.setAct("on");
                     accessControl(request);
 
-                    List<Terminal> machineList2 = getMachineList();
+                    List<Terminal> machineList2 = getMachineList().getList();
                     Map<String, String> mapIpMap = machineList2.stream().collect(Collectors.toMap(Terminal::getMac, Terminal::getIp));
-                    LeTvControl.sendCommond(mapIpMap.get(macLetv), 9900, "power");
+                    Stream.of(macLetv.split(",")).forEach(mac->{
+                        LeTvControl.sendCommond(mapIpMap.get(mac), 9900, "power");
+                    });
 
                     return;
                 }
