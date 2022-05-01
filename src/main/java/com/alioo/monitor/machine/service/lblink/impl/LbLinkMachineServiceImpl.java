@@ -133,25 +133,20 @@ public class LbLinkMachineServiceImpl implements MachineService {
     public boolean accessControl(AccessControlCommand request) {
 
         try {
-            String macArr[] = request.getMac().split(",");
+            String token = getToken();
 
-            for (int i = 0; i < macArr.length; i++) {
+            String myurl = "http://192.168.16.1/protocol.csp?token=" + token + "&fname=net&opt=host_black&function=set&mac=" + request.getMac() + "&act=" + request.getAct();
+            Map<String, String> headers = netWorkComponent.getHeaderMap();
+            Map<String, String> datas = new LinkedHashMap<>();
 
-                String token = getToken();
-
-                String myurl = "http://192.168.16.1/protocol.csp?token=" + token + "&fname=net&opt=host_black&function=set&mac=" + macArr[i] + "&act=" + request.getAct();
-                Map<String, String> headers = netWorkComponent.getHeaderMap();
-                Map<String, String> datas = new LinkedHashMap<>();
-
-                String ret = HttpUtil.post(myurl, headers, datas);
-                if (ret == null) {
-                    continue;
-                }
-
-                //{ "opt": "host_black", "fname": "net", "function": "set", "error": 0 }
-                LbResult lbResult = JsonUtil.fromJson(ret, LbResult.class);
-                log.info("accessCtrl信息：{}", JsonUtil.toJson(lbResult));
+            String ret = HttpUtil.post(myurl, headers, datas);
+            if (ret == null) {
+                return false;
             }
+
+            //{ "opt": "host_black", "fname": "net", "function": "set", "error": 0 }
+            LbResult lbResult = JsonUtil.fromJson(ret, LbResult.class);
+            log.info("accessCtrl信息：{}", JsonUtil.toJson(lbResult));
 
         } catch (Exception e) {
             log.error("accessCtrl时出现异常", e);
@@ -197,14 +192,15 @@ public class LbLinkMachineServiceImpl implements MachineService {
 
                 if (now.equals(obj.getStartTimeStr())) {
                     log.info("controlNetWork scheduled 命中开始时间:{}", obj.getStartTimeStr());
-                    AccessControlCommand request = new AccessControlCommand();
-                    request.setMac(macLetv);
-                    request.setAct("on");
-                    accessControl(request);
-
                     List<Terminal> machineList2 = getMachineList().getList();
                     Map<String, String> mapIpMap = machineList2.stream().collect(Collectors.toMap(Terminal::getMac, Terminal::getIp));
-                    Stream.of(macLetv.split(",")).forEach(mac->{
+
+                    Stream.of(macLetv.split(",")).forEach(mac -> {
+                        AccessControlCommand request = new AccessControlCommand();
+                        request.setMac(mac);
+                        request.setAct("on");
+                        accessControl(request);
+
                         LeTvControl.sendCommond(mapIpMap.get(mac), 9900, "power");
                     });
 
@@ -213,10 +209,12 @@ public class LbLinkMachineServiceImpl implements MachineService {
 
                 if (now.equals(obj.getEndTimeStr())) {
                     log.info("controlNetWork scheduled 命中结束时间:{}", obj.getEndTimeStr());
-                    AccessControlCommand request = new AccessControlCommand();
-                    request.setMac(macLetv);
-                    request.setAct("off");
-                    accessControl(request);
+                    Stream.of(macLetv.split(",")).forEach(mac -> {
+                        AccessControlCommand request = new AccessControlCommand();
+                        request.setMac(mac);
+                        request.setAct("off");
+                        accessControl(request);
+                    });
                     return;
                 }
             });
