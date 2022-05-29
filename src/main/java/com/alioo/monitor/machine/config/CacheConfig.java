@@ -20,7 +20,7 @@ public class CacheConfig {
                 //设置cache的容量上限
                 .maximumSize(10_000)
                 //缓存项在创建后，在给定时间内没有被读/写访问，则清除
-                .expireAfterWrite(10, TimeUnit.MINUTES)
+                .expireAfterWrite(60, TimeUnit.MINUTES)
                 //构建cache实例
                 .build();
 
