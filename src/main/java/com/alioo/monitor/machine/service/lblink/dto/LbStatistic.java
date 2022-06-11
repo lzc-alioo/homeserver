@@ -36,5 +36,4 @@ public class LbStatistic {
 
     private List<LbTerminal> terminals;
 
-
 }

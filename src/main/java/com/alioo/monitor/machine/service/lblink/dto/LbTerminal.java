@@ -32,8 +32,8 @@ public class LbTerminal implements Comparable<LbTerminal> {
     private String mac;
     private String ip;
 
-    private int speed;
-    private int upSpeed;
+    private int speed;//实时下载速度
+    private int upSpeed;//实时上传速度
     private int upBytes;
     private int downBytes;
 
