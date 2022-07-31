@@ -3,6 +3,7 @@ package com.alioo.monitor.md5;
 import com.alioo.monitor.util.DateTimeUtil;
 import com.alioo.monitor.util.FileUtil;
 import com.alioo.monitor.util.MD5Util;
+import com.alioo.monitor.util.NamedThreadFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -12,6 +13,10 @@ import org.springframework.util.ObjectUtils;
 import javax.annotation.PostConstruct;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicLong;
 
 @Slf4j
 @Component
@@ -26,6 +31,10 @@ public class Md5Main {
     @Value("${app.md5sleep:10}")
     private long md5sleep;
 
+    private int md5PoolSize=6;
+
+    ThreadPoolExecutor pool = new ThreadPoolExecutor(md5PoolSize, md5PoolSize, 0, TimeUnit.MINUTES, new ArrayBlockingQueue<Runnable>(100), new NamedThreadFactory("md5pool"), new ThreadPoolExecutor.CallerRunsPolicy());
+
     private static final String number = "0123456789";
     private static final String lower = "abcdefghijklmnopqrstuvwxyz";
     private static final String upper = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -35,7 +44,7 @@ public class Md5Main {
     @PostConstruct
     public void init() {
         //原始字符串
-        String lower_number = lower + number;
+        String lower_number = lower + number + special;
 
         //独立线程处理md5计算逻辑
         new Thread("md5thread") {
@@ -48,9 +57,10 @@ public class Md5Main {
     }
 
 
-
     public void process(String lower_number) {
         log.info("md5_start_data");
+
+        int len = lower_number.length();
 
         List<String> cursorList = FileUtil.readFile2List(md5path + "cursor.txt");
         int cursor[] = new int[8];
@@ -63,10 +73,10 @@ public class Md5Main {
             }
         }
 
-        log.info("md5_data_cursor:{}", Arrays.toString(cursor));
+        log.info("md5_start_data cursor:{}", Arrays.toString(cursor));
+        log.info("md5_start_data len:{}", len);
 
-        long tmp = 0;
-        int len = lower_number.length();
+        AtomicLong count = new AtomicLong();
 
         for (int i = 0; i < len; i++) {
             if (i < cursor[0]) {
@@ -118,9 +128,17 @@ public class Md5Main {
                                         newCursor[idx++] = o;
                                         newCursor[idx++] = p;
 
-                                        doOne(lower_number, tmp, newCursor);
+//                                        while(pool.getQueue().size()>80){
+//                                            try {
+//                                                Thread.sleep(md5sleep);
+//                                            } catch (InterruptedException e) {
+//                                                e.printStackTrace();
+//                                            }
+//                                        }
+                                        pool.submit(() -> {
+                                            doOne(lower_number, count.addAndGet(1), newCursor);
+                                        });
 
-                                        tmp++;
                                     }
                                 }
                             }
@@ -132,7 +150,7 @@ public class Md5Main {
         log.info("md5_end_data");
     }
 
-    private void doOne(String lower_number, long tmp, int[] newCursor) {
+    private void doOne(String lower_number, long count, int[] newCursor) {
         StringBuffer str = new StringBuffer();
         for (int i = 0; i < newCursor.length; i++) {
             str.append(lower_number.charAt(newCursor[i]));
@@ -144,9 +162,8 @@ public class Md5Main {
             FileUtil.writeFile(md5path + "md5.txt", Arrays.asList(md5 + "," + str + "," + DateTimeUtil.getDateTimeString("yyyyMMddHHmmss")), true);
         }
 
-
-        if (tmp % 1_000_000 == 0) {
-            log.info("md5_temp_data:{},val:{},cursor:{}", str, md5, Arrays.toString(newCursor));
+        if (count % 1_000_000 == 0) {
+            log.info("md5_temp_data:{},val:{},cursor:{},count:{}", str, md5, Arrays.toString(newCursor), count);
 
             FileUtil.writeFile(md5path + "cursor.txt", Arrays.asList(StringUtils.join(newCursor, ',')), false);
             try {
