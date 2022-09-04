@@ -32,23 +32,23 @@ public interface MachineService {
     boolean accessControl(AccessControlCommand controlCommand);
 
     /**
-     * 禁用上网的时间列表
+     * 查询指定机器组禁用上网的时间列表
      *
      * @return
      */
-    List<DisabledTime> getDisabledTimeList();
+    List<DisabledTime> getDisabledTimeList(String group);
 
     /**
      * 更新不可用的时间列表
      *
      * @return
      */
-    int updateDisabledTimeList(List<DisabledTime> list);
+    int updateDisabledTimeList(String machine, List<DisabledTime> list);
 
     /**
      * 基于「禁用上网的时间列表」来检查网络是否应该开启/关闭
      */
-    void controlNetWork();
+    void controlNetWork(String group);
 
     /**
      * 记录上网行为

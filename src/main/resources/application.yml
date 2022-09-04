@@ -26,7 +26,6 @@ management:
       exposure:
         include: '*'
 
-mac:
-  letv: B8:FC:9A:3E:6A:DC,80:9F:9B:CA:7E:38
+
 
 

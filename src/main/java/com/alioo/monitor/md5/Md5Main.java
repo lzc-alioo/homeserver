@@ -29,11 +29,14 @@ public class Md5Main {
     private String md5pattern;
 
     @Value("${app.md5sleep:10}")
-    private long md5sleep;
+    public long md5sleep;
 
-    private int md5PoolSize=6;
+    @Value("${app.md5count:1_000_000}")
+    public long md5count = 1_000_000;
 
-    ThreadPoolExecutor pool = new ThreadPoolExecutor(md5PoolSize, md5PoolSize, 0, TimeUnit.MINUTES, new ArrayBlockingQueue<Runnable>(100), new NamedThreadFactory("md5pool"), new ThreadPoolExecutor.CallerRunsPolicy());
+    private int md5PoolSize = 2;
+
+    ThreadPoolExecutor pool = new ThreadPoolExecutor(md5PoolSize, md5PoolSize, 0, TimeUnit.MINUTES, new ArrayBlockingQueue<Runnable>(20000), new NamedThreadFactory("md5pool"), new ThreadPoolExecutor.CallerRunsPolicy());
 
     private static final String number = "0123456789";
     private static final String lower = "abcdefghijklmnopqrstuvwxyz";
@@ -128,9 +131,12 @@ public class Md5Main {
                                         newCursor[idx++] = o;
                                         newCursor[idx++] = p;
 
-//                                        while(pool.getQueue().size()>80){
+//                                        long queueSize = pool.getQueue().size();
+//                                        while (queueSize > 10000) {
 //                                            try {
-//                                                Thread.sleep(md5sleep);
+//                                                long sleepTime = md5sleep * 4;
+//                                                log.info("md5 queueSize:{}, sleepTime:{}", queueSize, sleepTime);
+//                                                Thread.sleep(sleepTime);
 //                                            } catch (InterruptedException e) {
 //                                                e.printStackTrace();
 //                                            }
@@ -162,12 +168,20 @@ public class Md5Main {
             FileUtil.writeFile(md5path + "md5.txt", Arrays.asList(md5 + "," + str + "," + DateTimeUtil.getDateTimeString("yyyyMMddHHmmss")), true);
         }
 
-        if (count % 1_000_000 == 0) {
+        if (count % md5count == 0) {
             log.info("md5_temp_data:{},val:{},cursor:{},count:{}", str, md5, Arrays.toString(newCursor), count);
 
             FileUtil.writeFile(md5path + "cursor.txt", Arrays.asList(StringUtils.join(newCursor, ',')), false);
             try {
                 Thread.sleep(md5sleep);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
+        if (count % 10000 == 0) {
+            try {
+                Thread.sleep(5);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

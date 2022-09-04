@@ -1,9 +1,11 @@
 app:
-  timepath: /home/pi/work/build/time/tv.txt
+  timepath: /home/pi/work/build/time/
+  time-control: '{"tv": "B8:FC:9A:3E:6A:DC,80:9F:9B:CA:7E:38","mobile": "48:3C:0C:74:9B:F0,12:42:F5:68:31:34"}'
   monitorpath: /home/pi/work/build/monitor
   md5path: /home/pi/work/build/md5/
   md5pattern: "000000"
-  md5sleep: 20
+  md5sleep: 1000
+  md5count: 1_00_000
 
 server:
   tomcat:

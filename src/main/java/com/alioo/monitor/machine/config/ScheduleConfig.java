@@ -39,7 +39,8 @@ public class ScheduleConfig implements SchedulingConfigurer {
     //或直接指定时间间隔，例如：5秒
     //@Scheduled(fixedRate=5000)
     private void controlNetWork() {
-        machineService.controlNetWork();
+        machineService.controlNetWork("tv");
+        machineService.controlNetWork("mobile");
     }
 
 

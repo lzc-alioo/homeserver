@@ -1,3 +1,4 @@
+#copy this file content to /home/pi/.cpolar/cpolar.yml
 authtoken: NzVkMDFhN2ItNmI2OC00ZmFkLWFkMTMtYmIwYzMwZmQwNzIw
 tunnels:
   ssh:

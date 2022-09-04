@@ -20,9 +20,9 @@ public class AppConfig {
         MACHINE_MAP.put("80:9F:9B:CA:7E:38", new Machine("cm201", idx++));
         MACHINE_MAP.put("70:48:0F:52:ED:C1", new Machine("ali6s", idx++));
         MACHINE_MAP.put("12:42:F5:68:31:34", new Machine("ali6s2", idx++));
+        MACHINE_MAP.put("48:3C:0C:74:9B:F0", new Machine("hl", idx++));
         MACHINE_MAP.put("80:0C:67:1F:69:F7", new Machine("ali11", idx++));
         MACHINE_MAP.put("26:47:ED:93:9E:38", new Machine("ali11s", idx++));
-        MACHINE_MAP.put("48:3C:0C:74:9B:F0", new Machine("hl", idx++));
         MACHINE_MAP.put("A4:83:E7:3C:3F:3D", new Machine("ali13", idx++));
         MACHINE_MAP.put("38:F9:D3:2E:B6:DF", new Machine("ali15", idx++));
         MACHINE_MAP.put("00:F7:6F:9A:4A:A1", new Machine("ali5s", idx++));

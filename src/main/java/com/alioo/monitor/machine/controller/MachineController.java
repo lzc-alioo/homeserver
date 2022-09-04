@@ -8,6 +8,7 @@ import com.alioo.monitor.util.DateTimeUtil;
 import com.alioo.monitor.util.JsonUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -35,7 +36,7 @@ public class MachineController {
     public TerminalStatistic getMachineList() {
         log.info("machine/getMachineList...");
 
-        TerminalStatistic  terminalStatistic = machineService.getMachineList();
+        TerminalStatistic terminalStatistic = machineService.getMachineList();
         return terminalStatistic;
     }
 
@@ -58,10 +59,14 @@ public class MachineController {
      *
      */
     @RequestMapping("/getDisabledTimeList")
-    public List<DisabledTime> getDisabledTimeList() {
-        System.out.println("machine/getDisabledTimeList..");
+    public List<DisabledTime> getDisabledTimeList(String group) {
+        log.info("machine/getDisabledTimeList.. group:{}", group);
 
-        List<DisabledTime> list = machineService.getDisabledTimeList();
+        if (ObjectUtils.isEmpty(group)) {
+            group = "tv";
+        }
+
+        List<DisabledTime> list = machineService.getDisabledTimeList(group);
         log.info("查询禁用时间 list:{}", list);
         return list;
     }
@@ -71,13 +76,13 @@ public class MachineController {
      * @return
      */
     @RequestMapping("/updateDisabledTimeList")
-    public List<DisabledTime> updateUnavailableTimeList(@RequestBody List<DisabledTime> list) {
-        System.out.println("machine/updateDisabledTimeList...list:" + JsonUtil.toJson(list));
+    public List<DisabledTime> updateUnavailableTimeList(String group, @RequestBody List<DisabledTime> list) {
+        log.info("machine/updateDisabledTimeList... group:{} , list:{}", group, JsonUtil.toJson(list));
 
-        machineService.updateDisabledTimeList(list);
+        machineService.updateDisabledTimeList(group, list);
 
         log.info("设置禁用时间 list:{}", list);
-        return getDisabledTimeList();
+        return getDisabledTimeList(group);
     }
 
 
@@ -95,7 +100,7 @@ public class MachineController {
         filterNameSet.add("raspberrypi-usb");
 
         list = list.stream().filter(terminal -> {
-            if(filterNameSet.contains(terminal.getName())){
+            if (filterNameSet.contains(terminal.getName())) {
                 return false;
             }
             return true;

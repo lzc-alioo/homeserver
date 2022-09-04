@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
-# /home/pi/work/build/start.sh add to /etc/rc.local
+#/home/pi/work/build/start.sh add to /etc/rc.local like this:
+#/home/pi/work/timesync/timesync.sh  2>&1 >> /home/pi/work/timesync/timesync.log &
+#/home/pi/work/build/restart.sh
+#/home/pi/work/dns/restart.sh
+#/home/pi/work/cpolar/cpolarrestart.sh
+
 
 PATH_BASE=$(cd $(dirname $0); pwd)
 RUN_APP=homeserver-0.0.1-SNAPSHOT.jar
@@ -38,3 +43,6 @@ do
 done
 
 echo "$(date "+%Y-%m-%d %H:%M:%S") $RUN_APP started success."
+
+rm ${LOG_PATH}/console.log
+ln -s ${LOG_FILE} ${LOG_PATH}/console.log

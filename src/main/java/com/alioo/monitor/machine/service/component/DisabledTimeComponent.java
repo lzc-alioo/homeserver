@@ -5,9 +5,10 @@ import com.alioo.monitor.util.FileUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.util.ObjectUtils;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.io.File;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -18,65 +19,64 @@ public class DisabledTimeComponent {
     @Value("${app.timepath}")
     private String timepath;
 
-    private List<DisabledTime> list = new ArrayList<>();
+    //    private List<DisabledTime> list = new ArrayList<>();
+    private Map<String, List<DisabledTime>> map = new HashMap<>();
 
 
-    public List<DisabledTime> getDisabledTimeList() {
+    public List<DisabledTime> getDisabledTimeList(String group) {
 
-        if (list != null && !list.isEmpty()) {
-            return list;
+        if (!ObjectUtils.isEmpty(map)) {
+            List<DisabledTime> list = map.getOrDefault(group, Collections.EMPTY_LIST);
+            if (!ObjectUtils.isEmpty(list)) {
+                return list;
+            }
         }
 
-//        time.txt example
+//        tv.txt example
 //        19:40,20:00,1
 //        20:01,20:03,0
 //        21:23,23:59,1
-        List<String> tmplist = FileUtil.readFile2List(timepath);
-        log.info("readfile timepath:" + timepath, "tmplist=" + tmplist);
+        String file = timepath + group + ".txt";
+        List<String> tmpList = FileUtil.readFile2List(file);
+        log.info("readFile file:" + file, "tmpList=" + tmpList);
 
-        List<DisabledTime> disabledTimeList = tmplist.stream()
-                .map(str -> {
-                    String[] arr = str.split(",");
-                    if (arr.length != 3) {
-                        return null;
-                    }
-                    String startTimeStr = arr[0];
-                    String endTimeStr = arr[1];
-                    String checkedStr = arr[2];
+        List<DisabledTime> disabledTimeList = tmpList.stream().map(str -> {
+            String[] arr = str.split(",");
+            if (arr.length != 3) {
+                return null;
+            }
+            String startTimeStr = arr[0];
+            String endTimeStr = arr[1];
+            String checkedStr = arr[2];
 
-                    return new DisabledTime(startTimeStr, endTimeStr,checkedStr);
+            return new DisabledTime(startTimeStr, endTimeStr, checkedStr);
 
-                })
-                .filter(dto -> dto != null)
-                .sorted()
-                .collect(Collectors.toList());
+        }).filter(dto -> dto != null).sorted().collect(Collectors.toList());
 
-        this.list.clear();
-        list.addAll(disabledTimeList);
+//        this.list.clear();
+//        list.addAll(disabledTimeList);
+        map.put(group, disabledTimeList);
 
-        return list;
+        return disabledTimeList;
 
     }
 
 
-    public int updateUnavailableTimeList(List<DisabledTime> list) {
+    public int updateUnavailableTimeList(String machine, List<DisabledTime> list) {
 
-        this.list.clear();
-        this.list.addAll(list);
+//        this.list.clear();
+//        this.list.addAll(list);
+        map.put(machine, list);
 
-        List<String> tmplist = list.stream()
-                .map(dto -> {
-                    return dto.getStartTimeStr() + "," + dto.getEndTimeStr()+","+ dto.getCheckedStr();
-                })
-                .filter(dto -> dto != null)
-                .sorted()
-                .collect(Collectors.toList());
+        List<String> tmpList = list.stream().map(dto -> {
+            return dto.getStartTimeStr() + "," + dto.getEndTimeStr() + "," + dto.getCheckedStr();
+        }).filter(dto -> dto != null).sorted().collect(Collectors.toList());
 
+        String file = timepath + File.separator + machine + ".txt";
+        FileUtil.writeFile(file, tmpList, false);
+        log.info("writeFile file:" + file, "tmpList=" + tmpList);
 
-        FileUtil.writeFile(timepath, tmplist, false);
-        log.info("writefile timepath:" + timepath, "tmplist=" + tmplist);
-
-        return tmplist.size();
+        return tmpList.size();
 
     }
 

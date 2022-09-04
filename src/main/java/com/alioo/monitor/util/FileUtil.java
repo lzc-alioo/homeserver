@@ -79,7 +79,7 @@ public class FileUtil {
     }
 
 
-    public static void writeFile(String path, List<String> list, boolean append) {
+    public static synchronized void writeFile(String path, List<String> list, boolean append) {
         if (list == null || list.isEmpty()) {
             return;
         }

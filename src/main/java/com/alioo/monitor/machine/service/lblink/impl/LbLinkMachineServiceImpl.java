@@ -4,14 +4,13 @@ import com.alioo.monitor.machine.config.AppConfig;
 import com.alioo.monitor.machine.controller.request.AccessControlCommand;
 import com.alioo.monitor.machine.controller.request.NetWorkQuery;
 import com.alioo.monitor.machine.service.MachineService;
-import com.alioo.monitor.machine.service.component.NetWorkComponent;
 import com.alioo.monitor.machine.service.component.DisabledTimeComponent;
+import com.alioo.monitor.machine.service.component.NetWorkComponent;
 import com.alioo.monitor.machine.service.component.TokenComponent;
 import com.alioo.monitor.machine.service.domian.*;
 import com.alioo.monitor.machine.service.lblink.dto.LbResult;
 import com.alioo.monitor.machine.service.lblink.dto.LbStatistic;
 import com.alioo.monitor.machine.service.lblink.dto.LbTerminal;
-import com.alioo.monitor.machine.service.lblink.dto.LbToken;
 import com.alioo.monitor.machine.tv.LeTvControl;
 import com.alioo.monitor.util.DateTimeUtil;
 import com.alioo.monitor.util.FileUtil;
@@ -34,8 +33,8 @@ public class LbLinkMachineServiceImpl implements MachineService {
     @Value("${app.monitorpath}")
     private String monitorpath;
 
-    @Value("${mac.letv}")
-    private String macLetv;
+    @Value("#{${app.time-control}}")
+    private Map<String, String> timeControl;
 
     @Autowired
     private DisabledTimeComponent disabledTimeComponent;
@@ -158,32 +157,33 @@ public class LbLinkMachineServiceImpl implements MachineService {
     }
 
 
-    public List<DisabledTime> getDisabledTimeList() {
+    public List<DisabledTime> getDisabledTimeList(String group) {
 
-        List<DisabledTime> list = disabledTimeComponent.getDisabledTimeList();
+        List<DisabledTime> list = disabledTimeComponent.getDisabledTimeList(group);
 
         return list;
 
     }
 
 
-    public int updateDisabledTimeList(List<DisabledTime> list) {
+    public int updateDisabledTimeList(String machine, List<DisabledTime> list) {
 
-        int result = disabledTimeComponent.updateUnavailableTimeList(list);
+        int result = disabledTimeComponent.updateUnavailableTimeList(machine, list);
 
         return result;
 
     }
 
 
-    public void controlNetWork() {
+    public void controlNetWork(String group) {
 
         try {
             String now = DateTimeUtil.getDateTimeString("HH:mm");
 
-            List<DisabledTime> timeList = getDisabledTimeList();
-            log.info("定时执行 controlNetWork now:{},timeList{}", now, timeList);
+            List<DisabledTime> timeList = getDisabledTimeList(group);
 
+            String macs = timeControl.get(group);
+            log.info("定时执行 controlNetWork now:{},group:{},timeList{}", now, group, timeList);
 
             timeList.forEach(obj -> {
                 if (!obj.isChecked()) {
@@ -191,11 +191,11 @@ public class LbLinkMachineServiceImpl implements MachineService {
                 }
 
                 if (now.equals(obj.getStartTimeStr())) {
-                    log.info("controlNetWork scheduled 命中开始时间:{}", obj.getStartTimeStr());
+                    log.info("controlNetWork group:{}, 命中开始时间:{}", group, obj.getStartTimeStr());
                     List<Terminal> machineList2 = getMachineList().getList();
                     Map<String, String> mapIpMap = machineList2.stream().collect(Collectors.toMap(Terminal::getMac, Terminal::getIp));
 
-                    Stream.of(macLetv.split(",")).forEach(mac -> {
+                    Stream.of(macs.split(",")).forEach(mac -> {
                         AccessControlCommand request = new AccessControlCommand();
                         request.setMac(mac);
                         request.setAct("on");
@@ -208,8 +208,8 @@ public class LbLinkMachineServiceImpl implements MachineService {
                 }
 
                 if (now.equals(obj.getEndTimeStr())) {
-                    log.info("controlNetWork scheduled 命中结束时间:{}", obj.getEndTimeStr());
-                    Stream.of(macLetv.split(",")).forEach(mac -> {
+                    log.info("controlNetWork group:{}, 命中结束时间:{}", group, obj.getEndTimeStr());
+                    Stream.of(macs.split(",")).forEach(mac -> {
                         AccessControlCommand request = new AccessControlCommand();
                         request.setMac(mac);
                         request.setAct("off");
