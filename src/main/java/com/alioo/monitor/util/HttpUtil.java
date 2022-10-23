@@ -3,8 +3,7 @@ package com.alioo.monitor.util;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpEntity;
-import org.apache.http.ParseException;
-import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
@@ -20,8 +19,31 @@ import java.util.Map;
 @Slf4j
 public class HttpUtil {
 
+    public static CloseableHttpClient httpClient = null;
+
+    static {
+        RequestConfig defaultRequestConfig = RequestConfig.custom()
+                .setSocketTimeout(5000)
+                .setConnectTimeout(5000)
+                .setConnectionRequestTimeout(5000)
+                .build();
+
+        httpClient = HttpClientBuilder.create()
+                .setDefaultRequestConfig(defaultRequestConfig)
+                .setConnectionManagerShared(true)
+                .build();
+    }
+
     public static String get(String url, Map<String, String> headers) {
-        CloseableHttpClient httpClient = HttpClientBuilder.create().build();
+//        RequestConfig defaultRequestConfig = RequestConfig.custom()
+//                .setSocketTimeout(5000)
+//                .setConnectTimeout(5000)
+//                .setConnectionRequestTimeout(5000)
+//                .build();
+//
+//        CloseableHttpClient httpClient = HttpClientBuilder.create()
+//                .setDefaultRequestConfig(defaultRequestConfig)
+//                .build();
 
         // 创建Get请求
         HttpGet httpGet = new HttpGet(url);
@@ -50,12 +72,8 @@ public class HttpUtil {
 //                log.info("响应内容length:{},tmp:{}" ,length,tmp);
                 return ret;
             }
-        } catch (ClientProtocolException e) {
-            e.printStackTrace();
-        } catch (ParseException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            log.error("http send exception url:{}", url, e);
         } finally {
             try {
                 // 释放资源
@@ -74,14 +92,22 @@ public class HttpUtil {
 
 
     public static String post(String url, Map<String, String> headers, Map<String, String> datas) {
-        CloseableHttpClient httpClient = HttpClientBuilder.create().build();
+//        RequestConfig defaultRequestConfig = RequestConfig.custom()
+//                .setSocketTimeout(5000)
+//                .setConnectTimeout(5000)
+//                .setConnectionRequestTimeout(5000)
+//                .build();
+//
+//        CloseableHttpClient httpClient = HttpClientBuilder.create()
+//                .setDefaultRequestConfig(defaultRequestConfig)
+//                .build();
 
         // 创建Get请求
         HttpPost httpPost = new HttpPost(url);
 
         addHeaders(httpPost, headers);
 
-        addDatas(httpPost, datas);
+        addData(httpPost, datas);
 
         // 响应模型
         CloseableHttpResponse response = null;
@@ -104,12 +130,8 @@ public class HttpUtil {
 //                log.info("响应内容快照length:{},tmp:{}" ,length,tmp);
                 return ret;
             }
-        } catch (ClientProtocolException e) {
-            e.printStackTrace();
-        } catch (ParseException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            log.error("http send exception url:{}", url, e);
         } finally {
             try {
                 // 释放资源
@@ -139,7 +161,7 @@ public class HttpUtil {
     }
 
 
-    private static void addDatas(HttpPost request, Map<String, String> datas) {
+    private static void addData(HttpPost request, Map<String, String> datas) {
 
         if (datas == null || datas.isEmpty()) {
             request.setEntity(new StringEntity("", "utf-8"));

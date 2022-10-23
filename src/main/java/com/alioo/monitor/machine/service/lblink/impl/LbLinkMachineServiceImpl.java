@@ -234,10 +234,10 @@ public class LbLinkMachineServiceImpl implements MachineService {
 
             String token = getToken();
             LbStatistic lbStatistic = getMachineList(token);
-            List<LbTerminal> terminals = lbStatistic.getTerminals();
             if (lbStatistic == null || lbStatistic.getTerminals() == null) {
                 return;
             }
+            List<LbTerminal> terminals = lbStatistic.getTerminals();
 
             String realmonitorpath = this.monitorpath + "/" + DateTimeUtil.getDateTimeString("yyyyMMdd") + "/";
 

@@ -1,6 +1,7 @@
 package com.alioo.monitor.machine.config;
 
 import com.alioo.monitor.machine.service.MachineService;
+import com.alioo.monitor.util.NamedThreadFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -29,7 +30,9 @@ public class ScheduleConfig implements SchedulingConfigurer {
 
     @Bean
     public Executor taskExecutor() {
-        ScheduledThreadPoolExecutor scheduledThreadPoolExecutor = new ScheduledThreadPoolExecutor(5, new ThreadPoolExecutor.AbortPolicy());
+        ScheduledThreadPoolExecutor scheduledThreadPoolExecutor = new ScheduledThreadPoolExecutor(5
+                , new NamedThreadFactory("schedule-pool")
+                , new ThreadPoolExecutor.AbortPolicy());
         return scheduledThreadPoolExecutor;
     }
 
