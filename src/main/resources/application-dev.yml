@@ -1,6 +1,6 @@
 app:
   timepath: /Users/alioo/work/temp/time/
-  time-control: '{"tv": "B8:FC:9A:3E:6A:DC,80:9F:9B:CA:7E:38","mobile": "48:3C:0C:74:9B:F0,12:42:F5:68:31:34"}'
+  time-control: '{"tv": "B8:FC:9A:3E:6A:DC,80:9F:9B:CA:7E:38","mobile": "48:3C:0C:74:9B:F0,12:42:F5:68:31:34,22:D1:62:75:75:64"}'
   monitorpath: /Users/alioo/work/temp/monitor
   md5path: /Users/alioo/work/temp/md5/
   md5pattern: "000000"
