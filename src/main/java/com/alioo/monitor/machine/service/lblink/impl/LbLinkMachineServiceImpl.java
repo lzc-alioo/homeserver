@@ -1,6 +1,6 @@
 package com.alioo.monitor.machine.service.lblink.impl;
 
-import com.alioo.monitor.machine.config.AppConfig;
+import com.alioo.monitor.machine.config.MacIpConfig;
 import com.alioo.monitor.machine.controller.request.AccessControlCommand;
 import com.alioo.monitor.machine.controller.request.NetWorkQuery;
 import com.alioo.monitor.machine.service.MachineService;
@@ -61,30 +61,23 @@ public class LbLinkMachineServiceImpl implements MachineService {
             return TerminalStatistic.builder().list(Collections.EMPTY_LIST).build();
         }
 
-        List<Terminal> list = lbStatistic.getTerminals().stream()
-                .map(terminal -> {
+        List<Terminal> list = lbStatistic.getTerminals().stream().map(terminal -> {
 
-                    Terminal terminal2 = new Terminal();
-                    terminal2.setName(AppConfig.getNameAlias(terminal.getMac(), terminal.getName()));
-                    terminal2.setIp(terminal.getIp());
-                    terminal2.setMac(terminal.getMac());
+            Terminal terminal2 = new Terminal();
+            terminal2.setName(MacIpConfig.getNameAliasByMac(terminal.getMac(), terminal.getName()));
+            terminal2.setIp(terminal.getIp());
+            terminal2.setMac(terminal.getMac());
 
-                    terminal2.setDownSpeed(terminal.getSpeed());
-                    terminal2.setUpSpeed(terminal.getUpSpeed());
+            terminal2.setDownSpeed(terminal.getSpeed());
+            terminal2.setUpSpeed(terminal.getUpSpeed());
 
-                    terminal2.setChecked(("F".equals(terminal.getFlag().substring(2, 3))) ? true : false);
-                    terminal2.setState(ObjectUtils.isEmpty(terminal.getIp()) ? "off_online" : "on_line");
+            terminal2.setChecked(("F".equals(terminal.getFlag().substring(2, 3))) ? true : false);
+            terminal2.setState(ObjectUtils.isEmpty(terminal.getIp()) ? "off_online" : "on_line");
 
-                    return terminal2;
-                })
-                .collect(Collectors.toList());
+            return terminal2;
+        }).collect(Collectors.toList());
 
-        return TerminalStatistic.builder()
-                .downloadSpeed(lbStatistic.getCurSpeed())
-                .upSpeed(lbStatistic.getUpSpeed())
-                .onlineTime(lbStatistic.getOntime())
-                .list(list)
-                .build();
+        return TerminalStatistic.builder().downloadSpeed(lbStatistic.getCurSpeed()).upSpeed(lbStatistic.getUpSpeed()).onlineTime(lbStatistic.getOntime()).list(list).build();
 
     }
 
@@ -123,11 +116,17 @@ public class LbLinkMachineServiceImpl implements MachineService {
             return;
         }
 
-        lbStatistic.getTerminals().forEach(terminal -> terminal.setOrder(AppConfig.getOrder(terminal.getMac(), 10000)));
+        lbStatistic.getTerminals().forEach(terminal -> terminal.setOrder(MacIpConfig.getOrder(terminal.getMac(), 10000)));
 
         Collections.sort(lbStatistic.getTerminals());
     }
 
+    public boolean accessControl(String mac, String act) {
+        AccessControlCommand request = new AccessControlCommand();
+        request.setMac(mac);
+        request.setAct(act);
+        return accessControl(request);
+    }
 
     public boolean accessControl(AccessControlCommand request) {
 
@@ -196,10 +195,7 @@ public class LbLinkMachineServiceImpl implements MachineService {
                     Map<String, String> mapIpMap = machineList2.stream().collect(Collectors.toMap(Terminal::getMac, Terminal::getIp));
 
                     Stream.of(macs.split(",")).forEach(mac -> {
-                        AccessControlCommand request = new AccessControlCommand();
-                        request.setMac(mac);
-                        request.setAct("on");
-                        accessControl(request);
+                        accessControl(mac, "on");
 
                         LeTvControl.sendCommond(mapIpMap.get(mac), 9900, "power");
                     });
@@ -210,10 +206,7 @@ public class LbLinkMachineServiceImpl implements MachineService {
                 if (now.equals(obj.getEndTimeStr())) {
                     log.info("controlNetWork group:{}, 命中结束时间:{}", group, obj.getEndTimeStr());
                     Stream.of(macs.split(",")).forEach(mac -> {
-                        AccessControlCommand request = new AccessControlCommand();
-                        request.setMac(mac);
-                        request.setAct("off");
-                        accessControl(request);
+                        accessControl(mac, "off");
                     });
                     return;
                 }
@@ -244,23 +237,17 @@ public class LbLinkMachineServiceImpl implements MachineService {
             FileUtil.mkdirs(realmonitorpath);
 
             //流量监控
-            terminals.stream()
-                    .filter(terminal -> {
-                        return !ObjectUtils.isEmpty(terminal);
-                    })
-                    .forEach(terminal -> {
-                        //format data
-                        StringBuilder sb = new StringBuilder();
-                        sb.append(now).append(",")
-                                .append(terminal.getMac()).append(",")
-                                .append(terminal.getIp()).append(",")
-                                .append(terminal.getSpeed()).append(",")
-                                .append(terminal.getUpSpeed());
+            terminals.stream().filter(terminal -> {
+                return !ObjectUtils.isEmpty(terminal);
+            }).forEach(terminal -> {
+                //format data
+                StringBuilder sb = new StringBuilder();
+                sb.append(now).append(",").append(terminal.getMac()).append(",").append(terminal.getIp()).append(",").append(terminal.getSpeed()).append(",").append(terminal.getUpSpeed());
 
 
-                        FileUtil.writeFile(realmonitorpath + AppConfig.getNameAlias(terminal.getMac(), terminal.getName()), Arrays.asList(sb.toString()), true);
+                FileUtil.writeFile(realmonitorpath + MacIpConfig.getNameAliasByMac(terminal.getMac(), terminal.getName()), Arrays.asList(sb.toString()), true);
 
-                    });
+            });
 
 
         } catch (Exception e) {

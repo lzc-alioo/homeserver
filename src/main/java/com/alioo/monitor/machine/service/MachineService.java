@@ -23,6 +23,8 @@ public interface MachineService {
      */
     TerminalStatistic getMachineList();
 
+    boolean accessControl(String mac, String act);
+
     /**
      * 根据mac地址控制单台机器的上网行为
      *

@@ -6,6 +6,7 @@ app:
   md5pattern: "000000"
   md5sleep: 1000
   md5count: 1_00_000
+  macIpFile: /home/pi/work/build/macip.txt
 
 server:
   tomcat:

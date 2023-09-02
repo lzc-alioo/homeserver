@@ -6,6 +6,7 @@ app:
   md5pattern: "000000"
   md5sleep: 10000
   md5count: 1_000_000
+  macIpFile: /Users/alioo/work/temp/macip.txt
 
 
 server:

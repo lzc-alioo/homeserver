@@ -4,25 +4,30 @@ import com.alioo.monitor.machine.controller.request.AccessControlCommand;
 import com.alioo.monitor.machine.controller.request.NetWorkQuery;
 import com.alioo.monitor.machine.service.MachineService;
 import com.alioo.monitor.machine.service.domian.*;
+import com.alioo.monitor.machine.tv.LeTvControl;
 import com.alioo.monitor.util.DateTimeUtil;
 import com.alioo.monitor.util.JsonUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.ModelAndView;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Slf4j
 @RestController
 @RequestMapping("machine")
 public class MachineController {
+    @Value("#{${app.time-control}}")
+    private Map<String, String> timeControl;
 
     @Autowired
     private MachineService machineService;
@@ -148,5 +153,87 @@ public class MachineController {
 
     }
 
+
+//    /**
+//     * Example: http://127.0.0.1:8081/machine/qs/tv/on
+//     * @param group tv,mobile
+//     * @param command on/off
+//     * @return
+//     */
+//    @RequestMapping("/qs/{group}/{command}")
+//    public String quickStart(@PathVariable(required = false) String group, @PathVariable(required = false) String command) {
+//        log.info("quickStart group:{}.command:{}", group, command);
+//        if (ObjectUtils.isEmpty(group) || ObjectUtils.isEmpty(command)) {
+//            return "false";
+//        }
+//
+//        List<Terminal> machineList2 = getMachineList().getList();
+//        Map<String, String> mapIpMap = machineList2.stream().collect(Collectors.toMap(Terminal::getMac, Terminal::getIp));
+//
+//        Map<String, String> commandMap = new HashMap();
+//        commandMap.put("open", "off");
+//        commandMap.put("close", "on");
+//
+//        String macs = timeControl.get(group);
+//        if (ObjectUtils.isEmpty(macs)) {
+//            log.error("从timeControl中未匹配到 group:{}，timeControl:{}", group, JsonUtil.toJson(timeControl));
+//            return "false";
+//        }
+//
+//        Stream.of(macs.split(",")).forEach(mac -> {
+//            machineService.accessControl(mac, commandMap.get(command));
+//            if ("close".equals(command)) {
+//                LeTvControl.sendCommond(mapIpMap.get(mac), 9900, "power");
+//            }
+//        });
+//
+////        return "redirect:/main/index";
+//        return "redirect:/";
+//
+//    }
+
+
+    /**
+     * Example: http://127.0.0.1:8081/machine/qs/tv/open
+     * Example: http://127.0.0.1:8081/machine/qs/tv/close
+     * @param group tv,mobile
+     * @param command open/close
+     * @return
+     */
+    @RequestMapping("/qs/{group}/{command}")
+    public ModelAndView quickStart(@PathVariable(required = false) String group, @PathVariable(required = false) String command) {
+        ModelAndView mv = new ModelAndView();
+
+
+        log.info("quickStart group:{}.command:{}", group, command);
+        if (ObjectUtils.isEmpty(group) || ObjectUtils.isEmpty(command)) {
+            mv.addObject("result", false);
+            return mv;
+        }
+
+        List<Terminal> machineList2 = getMachineList().getList();
+        Map<String, String> mapIpMap = machineList2.stream().collect(Collectors.toMap(Terminal::getMac, Terminal::getIp));
+
+        Map<String, String> commandMap = new HashMap();
+        commandMap.put("open", "off");
+        commandMap.put("close", "on");
+
+        String macs = timeControl.get(group);
+        if (ObjectUtils.isEmpty(macs)) {
+            log.error("从timeControl中未匹配到 group:{}，timeControl:{}", group, JsonUtil.toJson(timeControl));
+            mv.addObject("result", false);
+            return mv;        }
+
+        Stream.of(macs.split(",")).forEach(mac -> {
+            machineService.accessControl(mac, commandMap.get(command));
+            if ("close".equals(command)) {
+                LeTvControl.sendCommond(mapIpMap.get(mac), 9900, "power");
+            }
+        });
+
+        mv.addObject("result", true);
+        mv.setViewName("redirect:/");
+        return mv;
+    }
 
 }
