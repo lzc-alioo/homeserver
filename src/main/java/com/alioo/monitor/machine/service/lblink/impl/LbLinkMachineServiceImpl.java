@@ -73,9 +73,10 @@ public class LbLinkMachineServiceImpl implements MachineService {
 
             terminal2.setChecked(("F".equals(terminal.getFlag().substring(2, 3))) ? true : false);
             terminal2.setState(ObjectUtils.isEmpty(terminal.getIp()) ? "off_online" : "on_line");
+            terminal2.setOrder(MacIpConfig.getOrder(terminal.getMac(),99999));
 
             return terminal2;
-        }).collect(Collectors.toList());
+        }).sorted().collect(Collectors.toList());
 
         return TerminalStatistic.builder().downloadSpeed(lbStatistic.getCurSpeed()).upSpeed(lbStatistic.getUpSpeed()).onlineTime(lbStatistic.getOntime()).list(list).build();
 
